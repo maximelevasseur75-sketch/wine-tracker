@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tracker Vin">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Tracker Vin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0c;
+  --surface: #15151a;
+  --surface-2: #1d1d24;
+  --border: #2a2a35;
+  --text: #ededf2;
+  --muted: #8a8a99;
+  --accent: #c89b6f;
+  --accent-dim: #6e5640;
+  --green: #6db887;
+  --yellow: #d4b653;
+  --orange: #d9824a;
+  --red: #d65454;
+  --red-deep: #8f2d2d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  overscroll-behavior: none;
+  min-height: 100vh;
+}
+
+body {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 18px 16px 110px;
+  position: relative;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.head h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+.head .date {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bac-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 18px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.bac-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--bac-color, var(--green));
+  transition: background 0.6s ease;
+}
+.bac-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.bac-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 54px;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--bac-color, var(--green));
+  transition: color 0.6s ease;
+}
+.bac-unit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--muted);
+  margin-left: 6px;
+  font-weight: 400;
+}
+.bac-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.bac-sub { display: flex; flex-direction: column; }
+.bac-sub-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.bac-sub-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--text);
+}
+.bac-sub-value .small {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 3px;
+}
+
+.counter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.counter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+.counter-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.counter-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1;
+}
+.counter-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.bottles {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.bottles-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.bottles-label .l {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+}
+.bottles-label .r {
+  font-size: 11px;
+  color: var(--accent);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+}
+.bottles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 30px;
+}
+.bottle {
+  width: 22px;
+  height: 30px;
+  position: relative;
+  display: inline-block;
+}
+.bottle.empty { opacity: 0.18; }
+.bottle svg { display: block; width: 100%; height: 100%; }
+
+.timeline {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.timeline-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  padding-bottom: 4px;
+}
+.timeline-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-item .t-hour { color: var(--accent); font-weight: 500; }
+.timeline-item .t-info { color: var(--muted); font-size: 11px; }
+.timeline-empty {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.warning {
+  background: linear-gradient(135deg, rgba(217,130,74,0.15), rgba(217,130,74,0.05));
+  border: 1px solid rgba(217,130,74,0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  display: none;
+}
+.warning.visible { display: block; }
+.warning strong {
+  color: var(--orange);
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.streak {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.streak-text {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.streak-value {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.add-btn-zone {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, transparent 0%, var(--bg) 40%);
+  padding: 18px 16px 22px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  max-width: 480px;
+  margin: 0 auto;
+  z-index: 50;
+}
+.add-btn {
+  flex: 1;
+  background: linear-gradient(180deg, var(--accent) 0%, #a17a52 100%);
+  border: none;
+  border-radius: 14px;
+  padding: 18px;
+  color: #1a1208;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(200,155,111,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s;
+}
+.add-btn:active { transform: scale(0.96); }
+.add-btn .plus { font-size: 20px; font-weight: 800; }
+.icon-btn {
+  width: 56px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s;
+}
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn.danger { color: var(--red); }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 12px;
+}
+.tab {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+.tab.active {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.history-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.history-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 12px;
+  align-items: center;
+}
+.history-row:last-child { border-bottom: none; }
+.history-row .h-date { color: var(--text); }
+.history-row .h-vol { color: var(--accent); font-weight: 500; }
+.history-row .h-bac { color: var(--muted); font-size: 11px; }
+.history-totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.history-totals .t { text-align: center; }
+.history-totals .t-l {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.history-totals .t-v {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-bg.visible { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px;
+  width: 100%;
+  max-width: 380px;
+}
+.modal h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.modal p.sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.field input, .field select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+.btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #1a1208;
+  border-color: var(--accent);
+}
+.btn.danger {
+  background: var(--red-deep);
+  color: var(--text);
+  border-color: var(--red-deep);
+}
+
+.toast {
+  position: fixed;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 90;
+  pointer-events: none;
+}
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 18px 4px 8px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Tracker Vin</h1>
+  <div class="date" id="dateLabel">—</div>
+</div>
+
+<div class="bac-card" id="bacCard">
+  <div class="bac-label">Alcoolémie estimée</div>
+  <div>
+    <span class="bac-value" id="bacValue">0,00</span><span class="bac-unit">g/L</span>
+  </div>
+  <div class="bac-grid">
+    <div class="bac-sub">
+      <div class="bac-sub-label">Alcool dans le sang</div>
+      <div class="bac-sub-value"><span id="bacGrams">0</span><span class="small">g</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Alcool métabolisé</div>
+      <div class="bac-sub-value"><span id="metabGrams">0</span><span class="small">g</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Dernier verre</div>
+      <div class="bac-sub-value" id="lastDrink">—</div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Retour à 0 g/L</div>
+      <div class="bac-sub-value" id="zeroTime">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="warning" id="baclofWarning">
+  <strong>⚠ Règle baclofène</strong>
+  Dose du soir : <b>uniquement au coucher</b>, jamais en complément de la prise de 18h. Ne jamais cumuler 18h + alcool + coucher.
+</div>
+
+<div class="counter-row">
+  <div class="counter-card">
+    <div class="counter-label">Verres</div>
+    <div class="counter-value" id="glassCount">0</div>
+    <div class="counter-sub" id="volTotal">0 cl ingérés</div>
+  </div>
+  <div class="counter-card">
+    <div class="counter-label">Alcool pur</div>
+    <div class="counter-value" id="alcoolPur">0<span style="font-size:14px;color:var(--muted);"> g</span></div>
+    <div class="counter-sub" id="degreInfo">Vin blanc · 12°</div>
+  </div>
+</div>
+
+<div class="bottles">
+  <div class="bottles-label">
+    <span class="l">Équivalent bouteilles</span>
+    <span class="r" id="bottleFraction">0 / 75 cl</span>
+  </div>
+  <div class="bottles-row" id="bottlesRow"></div>
+</div>
+
+<div class="streak">
+  <span class="streak-text">Jours consécutifs sans alcool</span>
+  <span class="streak-value" id="streakValue">0</span>
+</div>
+
+<div class="timeline" id="timeline">
+  <div class="timeline-label">Verres aujourd'hui</div>
+  <div id="timelineContent">
+    <div class="timeline-empty">Aucun verre enregistré</div>
+  </div>
+</div>
+
+<div class="section-title">Historique</div>
+<div class="tabs">
+  <button class="tab active" data-period="day">Jour</button>
+  <button class="tab" data-period="week">Semaine</button>
+  <button class="tab" data-period="month">Mois</button>
+  <button class="tab" data-period="year">Année</button>
+</div>
+<div class="history-totals">
+  <div class="t"><div class="t-l">Verres</div><div class="t-v" id="totGlasses">0</div></div>
+  <div class="t"><div class="t-l">Volume</div><div class="t-v" id="totVolume">0 cl</div></div>
+  <div class="t"><div class="t-l">Btl. eq.</div><div class="t-v" id="totBottles">0</div></div>
+</div>
+<div class="history-list" id="historyList"></div>
+
+<div class="add-btn-zone">
+  <button class="icon-btn" id="settingsBtn" title="Paramètres">⚙</button>
+  <button class="add-btn" id="addBtn">
+    <span class="plus">+</span>
+    <span>Verre</span>
+  </button>
+  <button class="icon-btn" id="adjustBtn" title="Ajuster total">⟲</button>
+  <button class="icon-btn danger" id="undoBtn" title="Annuler dernier">↶</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h2>Paramètres</h2>
+    <p class="sub">Calibration du calcul Widmark.</p>
+    <div class="field">
+      <label>Volume par verre (cl)</label>
+      <input type="number" id="volPerGlass" min="1" max="100" step="1">
+    </div>
+    <div class="field">
+      <label>Type de boisson</label>
+      <select id="drinkType">
+        <option value="vin_blanc">Vin blanc — 12°</option>
+        <option value="vin_rouge">Vin rouge — 13°</option>
+        <option value="champagne">Champagne — 12°</option>
+        <option value="biere_legere">Bière légère — 5°</option>
+        <option value="biere_forte">Bière forte — 8°</option>
+        <option value="spiritueux">Spiritueux — 40°</option>
+        <option value="custom">Personnalisé</option>
+      </select>
+    </div>
+    <div class="field" id="customDegreeField" style="display:none;">
+      <label>Degré alcoolique personnalisé (°)</label>
+      <input type="number" id="customDegree" min="0" max="80" step="0.5">
+    </div>
+    <div class="field">
+      <label>Poids corporel (kg)</label>
+      <input type="number" id="weight" min="30" max="200" step="0.1">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="settingsCancel">Annuler</button>
+      <button class="btn primary" id="settingsSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="adjustModal">
+  <div class="modal">
+    <h2>Ajuster le total</h2>
+    <p class="sub">Si tu as bu plus ou moins que les verres enregistrés, ajuste le volume total réel (en cl). L'app ajoute ou retire des verres virtuels en conséquence.</p>
+    <div class="field">
+      <label>Volume total réel aujourd'hui (cl)</label>
+      <input type="number" id="adjustVol" min="0" step="1">
+    </div>
+    <div class="field" style="font-size:11px;color:var(--muted);">
+      Actuellement enregistré : <span id="currentVol">0</span> cl<br>
+      1 bouteille = 75 cl
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="adjustCancel">Annuler</button>
+      <button class="btn primary" id="adjustSave">Appliquer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="undoModal">
+  <div class="modal">
+    <h2>Annuler le dernier verre ?</h2>
+    <p class="sub" id="undoSub">—</p>
+    <div class="modal-actions">
+      <button class="btn" id="undoCancel">Garder</button>
+      <button class="btn danger" id="undoConfirm">Annuler le verre</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ CONSTANTES ============
+const DRINK_TYPES = {
+  vin_blanc: { label: 'Vin blanc', degre: 12 },
+  vin_rouge: { label: 'Vin rouge', degre: 13 },
+  champagne: { label: 'Champagne', degre: 12 },
+  biere_legere: { label: 'Bière légère', degre: 5 },
+  biere_forte: { label: 'Bière forte', degre: 8 },
+  spiritueux: { label: 'Spiritueux', degre: 40 },
+  custom: { label: 'Personnalisé', degre: 12 }
+};
+const R_HOMME = 0.68;
+const ELIM_RATE = 0.15;
+const DENSITE_ETHANOL = 0.8;
+const STORAGE_PREFIX = 'wineTracker_';
+
+let settings = {
+  volPerGlass: 20,
+  drinkType: 'vin_blanc',
+  customDegree: 12,
+  weight: 78.4
+};
+let drinks = [];
+let currentPeriod = 'day';
+
+// ============ STORAGE (localStorage) ============
+function todayKey() {
+  const d = new Date();
+  return `${STORAGE_PREFIX}drinks_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateKey(d) {
+  return `${STORAGE_PREFIX}drinks_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function loadSettings() {
+  try {
+    const v = localStorage.getItem(STORAGE_PREFIX + 'settings');
+    if (v) settings = { ...settings, ...JSON.parse(v) };
+  } catch (e) {}
+}
+function saveSettings() {
+  try { localStorage.setItem(STORAGE_PREFIX + 'settings', JSON.stringify(settings)); } catch (e) {}
+}
+function loadToday() {
+  try {
+    const v = localStorage.getItem(todayKey());
+    drinks = v ? JSON.parse(v) : [];
+  } catch (e) { drinks = []; }
+}
+function saveToday() {
+  try { localStorage.setItem(todayKey(), JSON.stringify(drinks)); } catch (e) {}
+}
+
+// ============ CALCULS ============
+function currentDegree() {
+  if (settings.drinkType === 'custom') return parseFloat(settings.customDegree) || 12;
+  return DRINK_TYPES[settings.drinkType].degre;
+}
+function alcoolPurGrammes(volumeML, degre) {
+  return volumeML * (degre/100) * DENSITE_ETHANOL;
+}
+function computeBAC(drinksList, now) {
+  if (!drinksList.length) return { bac: 0, ingestedG: 0, inBloodG: 0, metabolizedG: 0, lastTime: null };
+  const sorted = [...drinksList].sort((a,b) => new Date(a.time) - new Date(b.time));
+  let bac = 0, lastT = null, ingested = 0;
+  for (const d of sorted) {
+    const t = new Date(d.time);
+    if (lastT) {
+      const dt = (t - lastT) / 3600000;
+      bac = Math.max(0, bac - ELIM_RATE * dt);
+    }
+    const ap = alcoolPurGrammes(d.volumeML, d.degre);
+    ingested += ap;
+    bac += ap / (settings.weight * R_HOMME);
+    lastT = t;
+  }
+  if (lastT) {
+    const dt = (now - lastT) / 3600000;
+    bac = Math.max(0, bac - ELIM_RATE * dt);
+  }
+  const inBlood = bac * settings.weight * R_HOMME;
+  const metabolized = Math.max(0, ingested - inBlood);
+  return { bac, ingestedG: ingested, inBloodG: inBlood, metabolizedG: metabolized, lastTime: lastT };
+}
+function bacColor(bac) {
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  if (bac < 0.3) return css('--green');
+  if (bac < 0.5) return css('--yellow');
+  if (bac < 0.8) return css('--orange');
+  if (bac < 1.5) return css('--red');
+  return css('--red-deep');
+}
+
+// ============ AFFICHAGE ============
+function formatDate(d) {
+  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+}
+function formatTime(d) {
+  if (!d) return '—';
+  return `${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function formatBAC(v) { return v.toFixed(2).replace('.', ','); }
+
+function renderBottles(totalCL) {
+  const fullBottles = Math.floor(totalCL / 75);
+  const remainCL = totalCL % 75;
+  const fillRatio = remainCL / 75;
+  const row = document.getElementById('bottlesRow');
+  row.innerHTML = '';
+  for (let i = 0; i < fullBottles; i++) row.appendChild(bottleSVG(1));
+  if (totalCL > 0 || fullBottles === 0) row.appendChild(bottleSVG(fillRatio));
+  document.getElementById('bottleFraction').textContent = fullBottles > 0
+    ? `${fullBottles} btl + ${Math.round(remainCL)} cl`
+    : `${Math.round(remainCL)} / 75 cl`;
+}
+function bottleSVG(fillRatio) {
+  const div = document.createElement('div');
+  div.className = 'bottle' + (fillRatio === 0 ? ' empty' : '');
+  const fillH = Math.max(0, Math.min(1, fillRatio)) * 18;
+  const fillY = 26 - fillH;
+  div.innerHTML = `
+    <svg viewBox="0 0 22 30">
+      <rect x="9" y="2" width="4" height="6" fill="#3a3a48" stroke="#5a5a6a" stroke-width="0.5"/>
+      <path d="M 7 8 Q 6 10 6 12 L 6 26 Q 6 28 8 28 L 14 28 Q 16 28 16 26 L 16 12 Q 16 10 15 8 Z" 
+            fill="#2a2a35" stroke="#5a5a6a" stroke-width="0.5"/>
+      <rect x="6" y="${fillY}" width="10" height="${fillH}" fill="#c89b6f" opacity="0.85"/>
+    </svg>`;
+  return div;
+}
+
+function renderTimeline() {
+  const c = document.getElementById('timelineContent');
+  if (!drinks.length) {
+    c.innerHTML = '<div class="timeline-empty">Aucun verre enregistré</div>';
+    return;
+  }
+  const sorted = [...drinks].sort((a,b) => new Date(b.time) - new Date(a.time));
+  c.innerHTML = sorted.map((d, i) => {
+    const t = new Date(d.time);
+    return `<div class="timeline-item">
+      <span class="t-hour">${formatTime(t)} · ${sorted.length - i}<sup>e</sup> verre</span>
+      <span class="t-info">${d.volumeML/10} cl · ${d.degre}°</span>
+    </div>`;
+  }).join('');
+}
+
+function showBaclofeneWarning() {
+  if (!drinks.length) {
+    document.getElementById('baclofWarning').classList.remove('visible');
+    return;
+  }
+  const last = new Date(drinks[drinks.length-1].time);
+  const h = last.getHours();
+  if (h >= 16 && h <= 22) {
+    document.getElementById('baclofWarning').classList.add('visible');
+  } else {
+    document.getElementById('baclofWarning').classList.remove('visible');
+  }
+}
+
+function computeStreak() {
+  let streak = 0;
+  if (drinks.length > 0) {
+    document.getElementById('streakValue').textContent = '0';
+    return;
+  }
+  const start = new Date();
+  for (let i = 1; i < 365; i++) {
+    const d = new Date(start);
+    d.setDate(d.getDate() - i);
+    const v = localStorage.getItem(dateKey(d));
+    if (v) {
+      try {
+        const arr = JSON.parse(v);
+        if (arr.length > 0) break;
+      } catch (e) { break; }
+    }
+    streak++;
+  }
+  document.getElementById('streakValue').textContent = streak;
+}
+
+function render() {
+  const now = new Date();
+  document.getElementById('dateLabel').textContent = formatDate(now);
+  const r = computeBAC(drinks, now);
+  document.getElementById('bacValue').textContent = formatBAC(r.bac);
+  document.documentElement.style.setProperty('--bac-color', bacColor(r.bac));
+  document.getElementById('bacGrams').textContent = r.inBloodG.toFixed(1).replace('.', ',');
+  document.getElementById('metabGrams').textContent = r.metabolizedG.toFixed(1).replace('.', ',');
+  document.getElementById('lastDrink').textContent = r.lastTime ? formatTime(r.lastTime) : '—';
+  if (r.bac > 0.01 && r.lastTime) {
+    const hoursToZero = r.bac / ELIM_RATE;
+    const zeroDate = new Date(now.getTime() + hoursToZero * 3600000);
+    document.getElementById('zeroTime').textContent = formatTime(zeroDate);
+  } else {
+    document.getElementById('zeroTime').textContent = '—';
+  }
+  const totalCL = drinks.reduce((s,d) => s + d.volumeML/10, 0);
+  document.getElementById('glassCount').textContent = drinks.length;
+  document.getElementById('volTotal').textContent = `${Math.round(totalCL)} cl ingérés`;
+  document.getElementById('alcoolPur').innerHTML = `${r.ingestedG.toFixed(1).replace('.', ',')}<span style="font-size:14px;color:var(--muted);"> g</span>`;
+  document.getElementById('degreInfo').textContent = `${DRINK_TYPES[settings.drinkType].label} · ${currentDegree()}°`;
+  renderBottles(totalCL);
+  renderTimeline();
+  showBaclofeneWarning();
+  computeStreak();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const now = new Date();
+  let startDate;
+  if (currentPeriod === 'day') startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  else if (currentPeriod === 'week') {
+    const dow = (now.getDay() + 6) % 7;
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+  }
+  else if (currentPeriod === 'month') startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  else if (currentPeriod === 'year') startDate = new Date(now.getFullYear(), 0, 1);
+
+  let totalGlasses = 0, totalVolCL = 0;
+  const rows = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(STORAGE_PREFIX + 'drinks_')) continue;
+    const dateStr = key.replace(STORAGE_PREFIX + 'drinks_', '');
+    const parts = dateStr.split('-').map(Number);
+    if (parts.length !== 3) continue;
+    const d = new Date(parts[0], parts[1]-1, parts[2]);
+    if (d < startDate || d > now) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(key));
+      if (!arr || !arr.length) continue;
+      const volCL = arr.reduce((s,x) => s + x.volumeML/10, 0);
+      const ingG = arr.reduce((s,x) => s + alcoolPurGrammes(x.volumeML, x.degre), 0);
+      const sorted = [...arr].sort((a,b) => new Date(a.time) - new Date(b.time));
+      const lastTime = new Date(sorted[sorted.length-1].time);
+      const peakBAC = computeBAC(arr, lastTime).bac;
+      totalGlasses += arr.length;
+      totalVolCL += volCL;
+      rows.push({ date: d, glasses: arr.length, volCL, ingG, peakBAC });
+    } catch (e) {}
+  }
+
+  rows.sort((a,b) => b.date - a.date);
+  document.getElementById('totGlasses').textContent = totalGlasses;
+  document.getElementById('totVolume').textContent = `${Math.round(totalVolCL)} cl`;
+  document.getElementById('totBottles').textContent = (totalVolCL/75).toFixed(1).replace('.', ',');
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="timeline-empty">Aucun verre sur cette période</div>';
+    return;
+  }
+  list.innerHTML = rows.map(r => {
+    const dateStr = r.date.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+    return `<div class="history-row">
+      <span class="h-date">${dateStr}</span>
+      <span class="h-vol">${Math.round(r.volCL)} cl · ${r.glasses} v.</span>
+      <span class="h-bac">pic ${formatBAC(r.peakBAC)} g/L</span>
+    </div>`;
+  }).join('');
+}
+
+// ============ ACTIONS ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 1800);
+}
+
+function addDrink() {
+  const drink = {
+    id: Date.now(),
+    time: new Date().toISOString(),
+    volumeML: settings.volPerGlass * 10,
+    degre: currentDegree()
+  };
+  drinks.push(drink);
+  saveToday();
+  render();
+  renderHistory();
+  showToast(`+ ${settings.volPerGlass} cl · ${formatTime(new Date(drink.time))}`);
+}
+
+function undoLastDrink() {
+  if (!drinks.length) return;
+  drinks.pop();
+  saveToday();
+  render();
+  renderHistory();
+  showToast('Dernier verre supprimé');
+}
+
+function adjustTotal(newVolCL) {
+  const volPerGlassCL = settings.volPerGlass;
+  const targetGlasses = Math.round(newVolCL / volPerGlassCL);
+  const currentGlasses = drinks.length;
+  if (targetGlasses === currentGlasses) { showToast('Aucun changement'); return; }
+  if (targetGlasses > currentGlasses) {
+    const toAdd = targetGlasses - currentGlasses;
+    const now = Date.now();
+    for (let i = 0; i < toAdd; i++) {
+      const offsetMin = (toAdd - i) * 20;
+      drinks.push({
+        id: now + i,
+        time: new Date(now - offsetMin * 60000).toISOString(),
+        volumeML: volPerGlassCL * 10,
+        degre: currentDegree()
+      });
+    }
+  } else {
+    drinks.sort((a,b) => new Date(a.time) - new Date(b.time));
+    drinks = drinks.slice(0, targetGlasses);
+  }
+  saveToday();
+  render();
+  renderHistory();
+  showToast(`Ajusté à ${targetGlasses} verres`);
+}
+
+// ============ EVENTS ============
+document.getElementById('addBtn').addEventListener('click', addDrink);
+
+document.getElementById('undoBtn').addEventListener('click', () => {
+  if (!drinks.length) { showToast('Aucun verre à annuler'); return; }
+  const last = drinks[drinks.length-1];
+  document.getElementById('undoSub').textContent = `Verre de ${last.volumeML/10} cl enregistré à ${formatTime(new Date(last.time))}.`;
+  document.getElementById('undoModal').classList.add('visible');
+});
+document.getElementById('undoConfirm').addEventListener('click', () => {
+  document.getElementById('undoModal').classList.remove('visible');
+  undoLastDrink();
+});
+document.getElementById('undoCancel').addEventListener('click', () => {
+  document.getElementById('undoModal').classList.remove('visible');
+});
+
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  document.getElementById('volPerGlass').value = settings.volPerGlass;
+  document.getElementById('drinkType').value = settings.drinkType;
+  document.getElementById('customDegree').value = settings.customDegree;
+  document.getElementById('weight').value = settings.weight;
+  document.getElementById('customDegreeField').style.display = settings.drinkType === 'custom' ? 'block' : 'none';
+  document.getElementById('settingsModal').classList.add('visible');
+});
+document.getElementById('drinkType').addEventListener('change', (e) => {
+  document.getElementById('customDegreeField').style.display = e.target.value === 'custom' ? 'block' : 'none';
+});
+document.getElementById('settingsCancel').addEventListener('click', () => {
+  document.getElementById('settingsModal').classList.remove('visible');
+});
+document.getElementById('settingsSave').addEventListener('click', () => {
+  settings.volPerGlass = parseInt(document.getElementById('volPerGlass').value) || 20;
+  settings.drinkType = document.getElementById('drinkType').value;
+  settings.customDegree = parseFloat(document.getElementById('customDegree').value) || 12;
+  settings.weight = parseFloat(document.getElementById('weight').value) || 78.4;
+  saveSettings();
+  document.getElementById('settingsModal').classList.remove('visible');
+  render();
+  showToast('Paramètres enregistrés');
+});
+
+document.getElementById('adjustBtn').addEventListener('click', () => {
+  const totalCL = drinks.reduce((s,d) => s + d.volumeML/10, 0);
+  document.getElementById('currentVol').textContent = Math.round(totalCL);
+  document.getElementById('adjustVol').value = Math.round(totalCL);
+  document.getElementById('adjustModal').classList.add('visible');
+});
+document.getElementById('adjustCancel').addEventListener('click', () => {
+  document.getElementById('adjustModal').classList.remove('visible');
+});
+document.getElementById('adjustSave').addEventListener('click', () => {
+  const newVol = parseFloat(document.getElementById('adjustVol').value);
+  if (isNaN(newVol) || newVol < 0) { showToast('Volume invalide'); return; }
+  document.getElementById('adjustModal').classList.remove('visible');
+  adjustTotal(newVol);
+});
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentPeriod = t.dataset.period;
+    renderHistory();
+  });
+});
+
+setInterval(() => {
+  if (drinks.length > 0) render();
+}, 30000);
+
+// Service worker pour PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
+  });
+}
+
+// Init
+loadSettings();
+loadToday();
+render();
+renderHistory();
+</script>
+</body>
+</html>
