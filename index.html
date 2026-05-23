@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tracker Vin">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Tracker Vin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0c;
+  --surface: #15151a;
+  --surface-2: #1d1d24;
+  --border: #2a2a35;
+  --text: #ededf2;
+  --muted: #8a8a99;
+  --accent: #c89b6f;
+  --accent-dim: #6e5640;
+  --green: #6db887;
+  --yellow: #d4b653;
+  --orange: #d9824a;
+  --red: #d65454;
+  --red-deep: #8f2d2d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  overscroll-behavior: none;
+  min-height: 100vh;
+}
+
+body {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 14px 14px 30px;
+  position: relative;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.head h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+.head .date {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ================================================
+   SELECTEUR DE VERRE — bloc principal en haut
+   ================================================ */
+.entry-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.entry-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Type de boisson - chips horizontales */
+.chips-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: 12px;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.chips-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 7px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.chip.active {
+  background: var(--accent);
+  color: #1a1208;
+  border-color: var(--accent);
+  font-weight: 500;
+}
+
+/* Grille champs (volume / degré / heure) */
+.fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.field-mini { display: flex; flex-direction: column; }
+.field-mini label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  padding-left: 2px;
+}
+.field-mini input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 10px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+}
+.field-mini input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.field-mini.with-unit {
+  position: relative;
+}
+.field-mini .unit {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(calc(-50% + 7px));
+  font-size: 11px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* Bouton principal */
+.btn-record {
+  width: 100%;
+  background: linear-gradient(180deg, var(--accent) 0%, #a17a52 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  color: #1a1208;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(200,155,111,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s;
+}
+.btn-record:active { transform: scale(0.97); }
+.btn-record .plus { font-size: 20px; font-weight: 800; }
+
+.btn-reset-time {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: var(--muted);
+  font-size: 9px;
+  cursor: pointer;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.btn-reset-time:active { background: var(--border); }
+
+/* ================================================
+   BAC CARD
+   ================================================ */
+.bac-card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 16px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.bac-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--bac-color, var(--green));
+  transition: background 0.6s ease;
+}
+.bac-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.bac-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 48px;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--bac-color, var(--green));
+  transition: color 0.6s ease;
+}
+.bac-unit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 6px;
+}
+.bac-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.bac-sub { display: flex; flex-direction: column; }
+.bac-sub-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.bac-sub-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--text);
+}
+.bac-sub-value .small {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 3px;
+}
+
+/* Compteurs */
+.counter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.counter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.counter-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.counter-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1;
+}
+.counter-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Bouteilles */
+.bottles {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.bottles-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.bottles-label .l {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+}
+.bottles-label .r {
+  font-size: 11px;
+  color: var(--accent);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+}
+.bottles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 30px;
+}
+.bottle { width: 22px; height: 30px; }
+.bottle.empty { opacity: 0.18; }
+.bottle svg { display: block; width: 100%; height: 100%; }
+
+/* Timeline */
+.timeline {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.timeline-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  padding-bottom: 4px;
+}
+.timeline-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding: 8px 6px;
+  border-bottom: 1px dashed var(--border);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.1s;
+}
+.timeline-item:active { background: var(--surface-2); }
+.timeline-item:last-child { border-bottom: none; }
+.timeline-item .t-hour { color: var(--accent); font-weight: 500; }
+.timeline-item .t-info { color: var(--muted); font-size: 11px; }
+.timeline-item .t-edit { color: var(--muted); font-size: 10px; margin-left: 6px; }
+.timeline-empty {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* Warning baclo */
+.warning {
+  background: linear-gradient(135deg, rgba(217,130,74,0.15), rgba(217,130,74,0.05));
+  border: 1px solid rgba(217,130,74,0.3);
+  border-radius: 12px;
+  padding: 11px 14px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  display: none;
+}
+.warning.visible { display: block; }
+.warning strong {
+  color: var(--orange);
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Métabolique */
+.metab-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.metab-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.metab-card.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--orange);
+}
+.metab-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.metab-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.1;
+  color: var(--text);
+}
+.metab-value .small {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 2px;
+}
+.metab-value.warn { color: var(--orange); }
+.metab-value.danger { color: var(--red); }
+.metab-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Streak */
+.streak {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.streak-text {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.streak-value {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 10px;
+}
+.tab {
+  flex: 1;
+  padding: 7px;
+  text-align: center;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+.tab.active {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.history-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  min-height: 80px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.history-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 12px;
+  align-items: center;
+}
+.history-row:last-child { border-bottom: none; }
+.history-row .h-date { color: var(--text); }
+.history-row .h-vol { color: var(--accent); font-weight: 500; }
+.history-row .h-bac { color: var(--muted); font-size: 11px; }
+.history-totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 11px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.history-totals .t { text-align: center; }
+.history-totals .t-l {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.history-totals .t-v {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* Settings row */
+.settings-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.settings-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.settings-btn:active { background: var(--surface-2); }
+
+/* Modal */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-bg.visible { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 380px;
+}
+.modal h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+.modal p.sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.field {
+  margin-bottom: 12px;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.field input, .field select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.fields-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #1a1208;
+  border-color: var(--accent);
+}
+.btn.danger {
+  background: var(--red-deep);
+  color: var(--text);
+  border-color: var(--red-deep);
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 90;
+  pointer-events: none;
+}
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 16px 4px 8px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Tracker Vin</h1>
+  <div class="date" id="dateLabel">—</div>
+</div>
+
+<!-- ============ SÉLECTEUR DE VERRE EN HAUT ============ -->
+<div class="entry-card">
+  <div class="entry-title">🍷 Nouveau verre</div>
+  
+  <!-- Chips type de boisson -->
+  <div class="chips-row" id="chipsRow">
+    <button class="chip active" data-type="vin_blanc">Vin blanc</button>
+    <button class="chip" data-type="vin_rouge">Vin rouge</button>
+    <button class="chip" data-type="vin_rose">Vin rosé</button>
+    <button class="chip" data-type="champagne">Champagne</button>
+    <button class="chip" data-type="biere">Bière</button>
+    <button class="chip" data-type="spiritueux">Spiritueux</button>
+    <button class="chip" data-type="autre">Autre</button>
+  </div>
+  
+  <!-- Champs volume / degré / heure -->
+  <div class="fields-grid">
+    <div class="field-mini">
+      <label>Volume (cl)</label>
+      <input type="number" id="inputVolume" min="1" max="200" step="1" value="20">
+    </div>
+    <div class="field-mini">
+      <label>Degré (°)</label>
+      <input type="number" id="inputDegree" min="0" max="80" step="0.5" value="12">
+    </div>
+    <div class="field-mini">
+      <label>Heure</label>
+      <input type="time" id="inputTime">
+    </div>
+  </div>
+  
+  <button class="btn-record" id="addBtn">
+    <span class="plus">+</span>
+    <span>Enregistrer le verre</span>
+  </button>
+</div>
+
+<!-- ============ ALCOOLÉMIE ============ -->
+<div class="bac-card">
+  <div class="bac-label">Alcoolémie estimée</div>
+  <div>
+    <span class="bac-value" id="bacValue">0,00</span><span class="bac-unit">g/L</span>
+  </div>
+  <div class="bac-grid">
+    <div class="bac-sub">
+      <div class="bac-sub-label">Alcool dans le sang</div>
+      <div class="bac-sub-value"><span id="bacGrams">0</span><span class="small">g</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Alcool métabolisé</div>
+      <div class="bac-sub-value"><span id="metabGrams">0</span><span class="small">g</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Dernier verre</div>
+      <div class="bac-sub-value" id="lastDrink">—</div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Retour à 0 g/L</div>
+      <div class="bac-sub-value" id="zeroTime">—</div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Calories alcool</div>
+      <div class="bac-sub-value"><span id="caloriesValue">0</span><span class="small"> kcal</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Ingéré aujourd'hui</div>
+      <div class="bac-sub-value" id="purGrams">0<span class="small"> g</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Impact métabolique : calories / lipolyse / hydratation -->
+<div class="metab-row">
+  <div class="metab-card" id="lipoCard">
+    <div class="metab-label">🚫 Lipolyse bloquée</div>
+    <div class="metab-value" id="lipoTime">—</div>
+    <div class="metab-sub" id="lipoStatus">Brûlage des graisses normal</div>
+  </div>
+  <div class="metab-card" id="waterCard">
+    <div class="metab-label">💧 Déficit hydrique</div>
+    <div class="metab-value" id="waterValue">0<span style="font-size:14px;color:var(--muted);"> mL</span></div>
+    <div class="metab-sub" id="waterStatus">Aucun</div>
+  </div>
+</div>
+
+<div class="metab-row" style="grid-template-columns: 1fr;">
+  <div class="metab-card" id="waterCompCard">
+    <div class="metab-label">🥤 Eau à compenser</div>
+    <div class="metab-value" id="waterCompValue">0<span style="font-size:14px;color:var(--muted);"> mL</span></div>
+    <div class="metab-sub" id="waterCompStatus">À boire en plus de l'apport habituel pour neutraliser l'effet diurétique</div>
+  </div>
+</div>
+
+<div class="warning" id="baclofWarning">
+  <strong>⚠ Règle baclofène</strong>
+  Dose du soir : <b>uniquement au coucher</b>, jamais en complément de la prise de 18h.
+</div>
+
+<!-- COMPTEURS -->
+<div class="counter-row">
+  <div class="counter-card">
+    <div class="counter-label">Verres aujourd'hui</div>
+    <div class="counter-value" id="glassCount">0</div>
+    <div class="counter-sub" id="volTotal">0 cl ingérés</div>
+  </div>
+  <div class="counter-card">
+    <div class="counter-label">Alcool pur</div>
+    <div class="counter-value" id="alcoolPur">0<span style="font-size:14px;color:var(--muted);"> g</span></div>
+    <div class="counter-sub" id="degreInfo">—</div>
+  </div>
+</div>
+
+<!-- BOUTEILLES -->
+<div class="bottles">
+  <div class="bottles-label">
+    <span class="l">Équivalent bouteilles</span>
+    <span class="r" id="bottleFraction">0 / 75 cl</span>
+  </div>
+  <div class="bottles-row" id="bottlesRow"></div>
+</div>
+
+<!-- STREAK -->
+<div class="streak">
+  <span class="streak-text">Jours consécutifs sans alcool</span>
+  <span class="streak-value" id="streakValue">0</span>
+</div>
+
+<!-- TIMELINE — verres du jour cliquables pour modifier -->
+<div class="timeline">
+  <div class="timeline-label">Verres aujourd'hui — touche pour modifier</div>
+  <div id="timelineContent">
+    <div class="timeline-empty">Aucun verre enregistré</div>
+  </div>
+</div>
+
+<!-- HISTORIQUE -->
+<div class="section-title">Historique</div>
+<div class="tabs">
+  <button class="tab active" data-period="day">Jour</button>
+  <button class="tab" data-period="week">Semaine</button>
+  <button class="tab" data-period="month">Mois</button>
+  <button class="tab" data-period="year">Année</button>
+</div>
+<div class="history-totals">
+  <div class="t"><div class="t-l">Verres</div><div class="t-v" id="totGlasses">0</div></div>
+  <div class="t"><div class="t-l">Volume</div><div class="t-v" id="totVolume">0 cl</div></div>
+  <div class="t"><div class="t-l">Btl. eq.</div><div class="t-v" id="totBottles">0</div></div>
+</div>
+<div class="history-list" id="historyList"></div>
+
+<!-- BOUTON PARAMÈTRES DISCRET -->
+<div class="settings-row">
+  <button class="settings-btn" id="settingsBtn">⚙ Paramètres (poids corporel)</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ MODAL PARAMÈTRES (simplifié) ============ -->
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h2>Paramètres</h2>
+    <p class="sub">Calibration du calcul d'alcoolémie (formule de Widmark).</p>
+    <div class="field">
+      <label>Poids corporel (kg)</label>
+      <input type="number" id="weight" min="30" max="200" step="0.1">
+    </div>
+    <div class="field" style="font-size:11px;color:var(--muted);line-height:1.5;">
+      <strong style="color:var(--text);font-size:11px;">Modèle utilisé</strong><br>
+      r = 0,68 (homme) · Élimination : 0,15 g/L/h<br>
+      BAC = (alcool en g) / (poids × r)
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="settingsCancel">Annuler</button>
+      <button class="btn primary" id="settingsSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL ÉDITION VERRE ============ -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h2>Modifier ce verre</h2>
+    <p class="sub" id="editSub">—</p>
+    <div class="fields-2col">
+      <div class="field">
+        <label>Volume (cl)</label>
+        <input type="number" id="editVolume" min="1" max="200" step="1">
+      </div>
+      <div class="field">
+        <label>Degré (°)</label>
+        <input type="number" id="editDegree" min="0" max="80" step="0.5">
+      </div>
+    </div>
+    <div class="field">
+      <label>Heure de consommation</label>
+      <input type="time" id="editTime">
+    </div>
+    <div class="modal-actions">
+      <button class="btn danger" id="editDelete">Supprimer</button>
+      <button class="btn" id="editCancel">Annuler</button>
+      <button class="btn primary" id="editSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ CONSTANTES ============
+const DRINK_TYPES = {
+  vin_blanc: { label: 'Vin blanc', defaultDegre: 12 },
+  vin_rouge: { label: 'Vin rouge', defaultDegre: 13 },
+  vin_rose: { label: 'Vin rosé', defaultDegre: 12 },
+  champagne: { label: 'Champagne', defaultDegre: 12 },
+  biere: { label: 'Bière', defaultDegre: 5 },
+  spiritueux: { label: 'Spiritueux', defaultDegre: 40 },
+  autre: { label: 'Autre', defaultDegre: 12 }
+};
+const R_HOMME = 0.68;
+const ELIM_RATE = 0.15;
+const DENSITE_ETHANOL = 0.8;
+const STORAGE_PREFIX = 'wineTracker_';
+
+let settings = { weight: 78.4 };
+let drinks = [];
+let currentType = 'vin_blanc';
+let editingDrinkId = null;
+let currentPeriod = 'day';
+
+// ============ STORAGE ============
+function todayKey() {
+  const d = new Date();
+  return `${STORAGE_PREFIX}drinks_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateKey(d) {
+  return `${STORAGE_PREFIX}drinks_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function loadSettings() {
+  try {
+    const v = localStorage.getItem(STORAGE_PREFIX + 'settings');
+    if (v) {
+      const parsed = JSON.parse(v);
+      // On garde uniquement weight et last-used
+      settings.weight = parsed.weight || 78.4;
+      if (parsed.lastType && DRINK_TYPES[parsed.lastType]) currentType = parsed.lastType;
+      if (parsed.lastVolume) document.getElementById('inputVolume').value = parsed.lastVolume;
+      if (parsed.lastDegree) document.getElementById('inputDegree').value = parsed.lastDegree;
+    }
+  } catch (e) {}
+}
+function saveSettings() {
+  try {
+    const obj = {
+      weight: settings.weight,
+      lastType: currentType,
+      lastVolume: parseInt(document.getElementById('inputVolume').value) || 20,
+      lastDegree: parseFloat(document.getElementById('inputDegree').value) || 12
+    };
+    localStorage.setItem(STORAGE_PREFIX + 'settings', JSON.stringify(obj));
+  } catch (e) {}
+}
+function loadToday() {
+  try {
+    const v = localStorage.getItem(todayKey());
+    drinks = v ? JSON.parse(v) : [];
+  } catch (e) { drinks = []; }
+}
+function saveToday() {
+  try { localStorage.setItem(todayKey(), JSON.stringify(drinks)); } catch (e) {}
+}
+
+// ============ CALCULS ============
+function alcoolPurGrammes(volumeML, degre) {
+  return volumeML * (degre/100) * DENSITE_ETHANOL;
+}
+function computeBAC(drinksList, now) {
+  if (!drinksList.length) return { bac: 0, ingestedG: 0, inBloodG: 0, metabolizedG: 0, lastTime: null };
+  const sorted = [...drinksList].sort((a,b) => new Date(a.time) - new Date(b.time));
+  let bac = 0, lastT = null, ingested = 0;
+  for (const d of sorted) {
+    const t = new Date(d.time);
+    if (lastT) {
+      const dt = (t - lastT) / 3600000;
+      bac = Math.max(0, bac - ELIM_RATE * dt);
+    }
+    const ap = alcoolPurGrammes(d.volumeML, d.degre);
+    ingested += ap;
+    bac += ap / (settings.weight * R_HOMME);
+    lastT = t;
+  }
+  if (lastT) {
+    const dt = (now - lastT) / 3600000;
+    bac = Math.max(0, bac - ELIM_RATE * dt);
+  }
+  const inBlood = bac * settings.weight * R_HOMME;
+  const metabolized = Math.max(0, ingested - inBlood);
+  return { bac, ingestedG: ingested, inBloodG: inBlood, metabolizedG: metabolized, lastTime: lastT };
+}
+function bacColor(bac) {
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  if (bac < 0.3) return css('--green');
+  if (bac < 0.5) return css('--yellow');
+  if (bac < 0.8) return css('--orange');
+  if (bac < 1.5) return css('--red');
+  return css('--red-deep');
+}
+
+// ============ FORMAT ============
+function formatDate(d) {
+  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+}
+function formatTime(d) {
+  if (!d) return '—';
+  return `${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function formatBAC(v) { return v.toFixed(2).replace('.', ','); }
+
+// Convertit une heure "HH:MM" en ISO date pour aujourd'hui
+function timeStrToISO(timeStr, baseDate) {
+  baseDate = baseDate || new Date();
+  const [h, m] = timeStr.split(':').map(Number);
+  const d = new Date(baseDate);
+  d.setHours(h || 0, m || 0, 0, 0);
+  return d.toISOString();
+}
+
+function getCurrentTimeStr() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ============ AFFICHAGE ============
+function renderBottles(totalCL) {
+  const fullBottles = Math.floor(totalCL / 75);
+  const remainCL = totalCL % 75;
+  const fillRatio = remainCL / 75;
+  const row = document.getElementById('bottlesRow');
+  row.innerHTML = '';
+  for (let i = 0; i < fullBottles; i++) row.appendChild(bottleSVG(1));
+  if (totalCL > 0 || fullBottles === 0) row.appendChild(bottleSVG(fillRatio));
+  document.getElementById('bottleFraction').textContent = fullBottles > 0
+    ? `${fullBottles} btl + ${Math.round(remainCL)} cl`
+    : `${Math.round(remainCL)} / 75 cl`;
+}
+function bottleSVG(fillRatio) {
+  const div = document.createElement('div');
+  div.className = 'bottle' + (fillRatio === 0 ? ' empty' : '');
+  const fillH = Math.max(0, Math.min(1, fillRatio)) * 18;
+  const fillY = 26 - fillH;
+  div.innerHTML = `
+    <svg viewBox="0 0 22 30">
+      <rect x="9" y="2" width="4" height="6" fill="#3a3a48" stroke="#5a5a6a" stroke-width="0.5"/>
+      <path d="M 7 8 Q 6 10 6 12 L 6 26 Q 6 28 8 28 L 14 28 Q 16 28 16 26 L 16 12 Q 16 10 15 8 Z" 
+            fill="#2a2a35" stroke="#5a5a6a" stroke-width="0.5"/>
+      <rect x="6" y="${fillY}" width="10" height="${fillH}" fill="#c89b6f" opacity="0.85"/>
+    </svg>`;
+  return div;
+}
+
+function renderTimeline() {
+  const c = document.getElementById('timelineContent');
+  if (!drinks.length) {
+    c.innerHTML = '<div class="timeline-empty">Aucun verre enregistré</div>';
+    return;
+  }
+  const sorted = [...drinks].sort((a,b) => new Date(b.time) - new Date(a.time));
+  c.innerHTML = sorted.map((d, i) => {
+    const t = new Date(d.time);
+    const typeLabel = d.type && DRINK_TYPES[d.type] ? DRINK_TYPES[d.type].label : '—';
+    return `<div class="timeline-item" data-id="${d.id}">
+      <span><span class="t-hour">${formatTime(t)}</span> <span class="t-info">· ${sorted.length - i}e verre</span></span>
+      <span class="t-info">${d.volumeML/10} cl · ${typeLabel} ${d.degre}° <span class="t-edit">✎</span></span>
+    </div>`;
+  }).join('');
+  // Attache les listeners pour édition
+  c.querySelectorAll('.timeline-item').forEach(el => {
+    el.addEventListener('click', () => openEditModal(parseInt(el.dataset.id)));
+  });
+}
+
+function showBaclofeneWarning() {
+  if (!drinks.length) {
+    document.getElementById('baclofWarning').classList.remove('visible');
+    return;
+  }
+  // Cherche le verre le plus récent
+  const sorted = [...drinks].sort((a,b) => new Date(b.time) - new Date(a.time));
+  const last = new Date(sorted[0].time);
+  const h = last.getHours();
+  if (h >= 16 && h <= 22) {
+    document.getElementById('baclofWarning').classList.add('visible');
+  } else {
+    document.getElementById('baclofWarning').classList.remove('visible');
+  }
+}
+
+function computeStreak() {
+  let streak = 0;
+  if (drinks.length > 0) {
+    document.getElementById('streakValue').textContent = '0';
+    return;
+  }
+  const start = new Date();
+  for (let i = 1; i < 365; i++) {
+    const d = new Date(start);
+    d.setDate(d.getDate() - i);
+    const v = localStorage.getItem(dateKey(d));
+    if (v) {
+      try {
+        const arr = JSON.parse(v);
+        if (arr.length > 0) break;
+      } catch (e) { break; }
+    }
+    streak++;
+  }
+  document.getElementById('streakValue').textContent = streak;
+}
+
+function render() {
+  const now = new Date();
+  document.getElementById('dateLabel').textContent = formatDate(now);
+  const r = computeBAC(drinks, now);
+  document.getElementById('bacValue').textContent = formatBAC(r.bac);
+  document.documentElement.style.setProperty('--bac-color', bacColor(r.bac));
+  document.getElementById('bacGrams').textContent = r.inBloodG.toFixed(1).replace('.', ',');
+  document.getElementById('metabGrams').textContent = r.metabolizedG.toFixed(1).replace('.', ',');
+  document.getElementById('lastDrink').textContent = r.lastTime ? formatTime(r.lastTime) : '—';
+  
+  // ===== Calories alcool (7 kcal/g d'éthanol pur) =====
+  const calories = Math.round(r.ingestedG * 7);
+  document.getElementById('caloriesValue').textContent = calories;
+  document.getElementById('purGrams').innerHTML = `${r.ingestedG.toFixed(1).replace('.', ',')}<span class="small"> g</span>`;
+  
+  // ===== Retour à 0 g/L + fenêtre de lipolyse bloquée =====
+  let zeroTimeStr = '—';
+  let lipoTimeStr = '—';
+  let lipoStatusStr = 'Brûlage des graisses normal';
+  let lipoActive = false;
+  
+  if (r.bac > 0.01 && r.lastTime) {
+    const hoursToZero = r.bac / ELIM_RATE;
+    const zeroDate = new Date(now.getTime() + hoursToZero * 3600000);
+    zeroTimeStr = formatTime(zeroDate);
+    
+    // Lipolyse bloquée : du 1er verre du jour jusqu'au retour à 0
+    const sorted = [...drinks].sort((a,b) => new Date(a.time) - new Date(b.time));
+    const firstDrinkTime = new Date(sorted[0].time);
+    const lipoStart = formatTime(firstDrinkTime);
+    const lipoEnd = formatTime(zeroDate);
+    const lipoHours = ((zeroDate - firstDrinkTime) / 3600000);
+    lipoTimeStr = `${lipoStart} → ${lipoEnd}`;
+    lipoStatusStr = `Durée totale : ${lipoHours.toFixed(1).replace('.', ',')} h · oxydation des graisses ≈ 0 pendant cette fenêtre`;
+    lipoActive = true;
+  } else if (drinks.length > 0) {
+    // Tous les verres déjà métabolisés
+    const sorted = [...drinks].sort((a,b) => new Date(a.time) - new Date(b.time));
+    const firstDrinkTime = new Date(sorted[0].time);
+    const lastDrinkTime = new Date(sorted[sorted.length-1].time);
+    // estimation : dernière BAC = 0 atteint juste avant maintenant (cas où bac actuel < 0.01)
+    const totalAP = drinks.reduce((s,d) => s + alcoolPurGrammes(d.volumeML, d.degre), 0);
+    const peakBAC = totalAP / (settings.weight * R_HOMME);
+    const totalLipoHours = (lastDrinkTime - firstDrinkTime) / 3600000 + peakBAC / ELIM_RATE;
+    lipoTimeStr = `${formatTime(firstDrinkTime)} → ${formatTime(new Date(firstDrinkTime.getTime() + totalLipoHours*3600000))}`;
+    lipoStatusStr = `Fenêtre passée · ~${totalLipoHours.toFixed(1).replace('.', ',')} h sans oxydation des graisses`;
+  }
+  
+  document.getElementById('zeroTime').textContent = zeroTimeStr;
+  document.getElementById('lipoTime').textContent = lipoTimeStr;
+  document.getElementById('lipoStatus').textContent = lipoStatusStr;
+  const lipoCard = document.getElementById('lipoCard');
+  if (lipoActive) {
+    lipoCard.classList.add('active');
+    document.getElementById('lipoTime').classList.add('warn');
+  } else {
+    lipoCard.classList.remove('active');
+    document.getElementById('lipoTime').classList.remove('warn');
+  }
+  
+  // ===== Déficit hydrique (effet diurétique alcool) =====
+  // Référence : Hobson & Maughan, 2010 — ~10 mL urine en excès par g d'éthanol
+  // L'eau perdue (déficit) est plus modeste car partiellement compensée par l'eau du vin
+  // Estimation prudente : 10 mL diurèse/g éthanol, dont ~6-7 mL nets de déficit
+  const waterDeficitML = Math.round(r.ingestedG * 10);
+  // Eau dans la boisson : ~85% du volume pour vin/bière, ~50% pour spiritueux
+  const waterIntakeFromDrinks = drinks.reduce((s, d) => {
+    const waterFraction = d.degre > 25 ? 0.5 : (1 - d.degre / 100 * 0.9);
+    return s + d.volumeML * waterFraction;
+  }, 0);
+  const netDeficitML = Math.max(0, waterDeficitML - waterIntakeFromDrinks * 0.3);
+  // Le calcul ci-dessus est conservateur. Pour simplicité, on retient waterDeficitML brut comme indicateur de l'effet diurétique
+  
+  document.getElementById('waterValue').innerHTML = `${waterDeficitML}<span style="font-size:14px;color:var(--muted);"> mL</span>`;
+  if (waterDeficitML === 0) {
+    document.getElementById('waterStatus').textContent = 'Aucun';
+  } else if (waterDeficitML < 300) {
+    document.getElementById('waterStatus').textContent = 'Diurèse modérée';
+  } else if (waterDeficitML < 800) {
+    document.getElementById('waterStatus').textContent = 'Déshydratation amorcée';
+    document.getElementById('waterValue').classList.add('warn');
+  } else {
+    document.getElementById('waterStatus').textContent = 'Déshydratation marquée';
+    document.getElementById('waterValue').classList.add('danger');
+  }
+  if (waterDeficitML < 300) document.getElementById('waterValue').classList.remove('warn', 'danger');
+  if (waterDeficitML < 800) document.getElementById('waterValue').classList.remove('danger');
+  
+  // ===== Eau à compenser =====
+  // Règle clinique : 150-200 mL d'eau supplémentaires par 10 g d'éthanol
+  // Je prends 180 mL/10g comme valeur de référence (milieu de fourchette)
+  const waterCompML = Math.round(r.ingestedG * 18);
+  document.getElementById('waterCompValue').innerHTML = `${waterCompML}<span style="font-size:14px;color:var(--muted);"> mL</span>`;
+  if (waterCompML === 0) {
+    document.getElementById('waterCompStatus').textContent = 'À boire en plus de l\'apport habituel pour neutraliser l\'effet diurétique';
+  } else {
+    const glassCount = (waterCompML / 250).toFixed(1).replace('.', ',');
+    document.getElementById('waterCompStatus').textContent = `≈ ${glassCount} verre(s) de 25 cl · à répartir pendant et après la consommation`;
+  }
+  
+  const totalCL = drinks.reduce((s,d) => s + d.volumeML/10, 0);
+  document.getElementById('glassCount').textContent = drinks.length;
+  document.getElementById('volTotal').textContent = `${Math.round(totalCL)} cl ingérés`;
+  document.getElementById('alcoolPur').innerHTML = `${r.ingestedG.toFixed(1).replace('.', ',')}<span style="font-size:14px;color:var(--muted);"> g</span>`;
+  // Affiche le type/degré du dernier verre, sinon les défauts actuels
+  if (drinks.length > 0) {
+    const sorted = [...drinks].sort((a,b) => new Date(b.time) - new Date(a.time));
+    const last = sorted[0];
+    const typeLabel = last.type && DRINK_TYPES[last.type] ? DRINK_TYPES[last.type].label : '—';
+    document.getElementById('degreInfo').textContent = `Dernier : ${typeLabel} · ${last.degre}°`;
+  } else {
+    document.getElementById('degreInfo').textContent = `${DRINK_TYPES[currentType].label} · ${document.getElementById('inputDegree').value}°`;
+  }
+  renderBottles(totalCL);
+  renderTimeline();
+  showBaclofeneWarning();
+  computeStreak();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const now = new Date();
+  let startDate;
+  if (currentPeriod === 'day') startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  else if (currentPeriod === 'week') {
+    const dow = (now.getDay() + 6) % 7;
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+  }
+  else if (currentPeriod === 'month') startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  else if (currentPeriod === 'year') startDate = new Date(now.getFullYear(), 0, 1);
+
+  let totalGlasses = 0, totalVolCL = 0;
+  const rows = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(STORAGE_PREFIX + 'drinks_')) continue;
+    const dateStr = key.replace(STORAGE_PREFIX + 'drinks_', '');
+    const parts = dateStr.split('-').map(Number);
+    if (parts.length !== 3) continue;
+    const d = new Date(parts[0], parts[1]-1, parts[2]);
+    if (d < startDate || d > now) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(key));
+      if (!arr || !arr.length) continue;
+      const volCL = arr.reduce((s,x) => s + x.volumeML/10, 0);
+      const sorted = [...arr].sort((a,b) => new Date(a.time) - new Date(b.time));
+      const lastTime = new Date(sorted[sorted.length-1].time);
+      const peakBAC = computeBAC(arr, lastTime).bac;
+      totalGlasses += arr.length;
+      totalVolCL += volCL;
+      rows.push({ date: d, glasses: arr.length, volCL, peakBAC });
+    } catch (e) {}
+  }
+
+  rows.sort((a,b) => b.date - a.date);
+  document.getElementById('totGlasses').textContent = totalGlasses;
+  document.getElementById('totVolume').textContent = `${Math.round(totalVolCL)} cl`;
+  document.getElementById('totBottles').textContent = (totalVolCL/75).toFixed(1).replace('.', ',');
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="timeline-empty">Aucun verre sur cette période</div>';
+    return;
+  }
+  list.innerHTML = rows.map(r => {
+    const dateStr = r.date.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+    return `<div class="history-row">
+      <span class="h-date">${dateStr}</span>
+      <span class="h-vol">${Math.round(r.volCL)} cl · ${r.glasses} v.</span>
+      <span class="h-bac">pic ${formatBAC(r.peakBAC)} g/L</span>
+    </div>`;
+  }).join('');
+}
+
+// ============ ACTIONS ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 1800);
+}
+
+function addDrink() {
+  const volume = parseFloat(document.getElementById('inputVolume').value);
+  const degree = parseFloat(document.getElementById('inputDegree').value);
+  const timeStr = document.getElementById('inputTime').value;
+  
+  if (!volume || volume <= 0) { showToast('Volume invalide'); return; }
+  if (degree === '' || degree < 0) { showToast('Degré invalide'); return; }
+  if (!timeStr) { showToast('Heure invalide'); return; }
+  
+  const drink = {
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    time: timeStrToISO(timeStr),
+    volumeML: volume * 10,
+    degre: degree,
+    type: currentType
+  };
+  drinks.push(drink);
+  saveToday();
+  saveSettings();
+  render();
+  renderHistory();
+  showToast(`+ ${volume} cl · ${DRINK_TYPES[currentType].label} · ${formatTime(new Date(drink.time))}`);
+  
+  // Réinitialise l'heure à maintenant
+  document.getElementById('inputTime').value = getCurrentTimeStr();
+}
+
+function openEditModal(id) {
+  const drink = drinks.find(d => d.id === id);
+  if (!drink) return;
+  editingDrinkId = id;
+  const t = new Date(drink.time);
+  const typeLabel = drink.type && DRINK_TYPES[drink.type] ? DRINK_TYPES[drink.type].label : '—';
+  document.getElementById('editSub').textContent = `${typeLabel} enregistré à ${formatTime(t)}`;
+  document.getElementById('editVolume').value = drink.volumeML / 10;
+  document.getElementById('editDegree').value = drink.degre;
+  document.getElementById('editTime').value = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('editModal').classList.add('visible');
+}
+
+function saveEditedDrink() {
+  if (editingDrinkId === null) return;
+  const idx = drinks.findIndex(d => d.id === editingDrinkId);
+  if (idx === -1) return;
+  const vol = parseFloat(document.getElementById('editVolume').value);
+  const deg = parseFloat(document.getElementById('editDegree').value);
+  const timeStr = document.getElementById('editTime').value;
+  if (!vol || vol <= 0) { showToast('Volume invalide'); return; }
+  if (deg < 0 || isNaN(deg)) { showToast('Degré invalide'); return; }
+  if (!timeStr) { showToast('Heure invalide'); return; }
+  
+  // Conserve la date du verre, ne change que l'heure
+  const baseDate = new Date(drinks[idx].time);
+  drinks[idx].volumeML = vol * 10;
+  drinks[idx].degre = deg;
+  drinks[idx].time = timeStrToISO(timeStr, baseDate);
+  
+  saveToday();
+  render();
+  renderHistory();
+  closeEditModal();
+  showToast('Verre modifié');
+}
+
+function deleteDrink() {
+  if (editingDrinkId === null) return;
+  drinks = drinks.filter(d => d.id !== editingDrinkId);
+  saveToday();
+  render();
+  renderHistory();
+  closeEditModal();
+  showToast('Verre supprimé');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('visible');
+  editingDrinkId = null;
+}
+
+// ============ EVENTS ============
+// Sélection type
+document.querySelectorAll('#chipsRow .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#chipsRow .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentType = chip.dataset.type;
+    // Met à jour le degré par défaut
+    const def = DRINK_TYPES[currentType];
+    if (def) document.getElementById('inputDegree').value = def.defaultDegre;
+    saveSettings();
+  });
+});
+
+// Bouton ajout
+document.getElementById('addBtn').addEventListener('click', addDrink);
+
+// Settings modal
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  document.getElementById('weight').value = settings.weight;
+  document.getElementById('settingsModal').classList.add('visible');
+});
+document.getElementById('settingsCancel').addEventListener('click', () => {
+  document.getElementById('settingsModal').classList.remove('visible');
+});
+document.getElementById('settingsSave').addEventListener('click', () => {
+  settings.weight = parseFloat(document.getElementById('weight').value) || 78.4;
+  saveSettings();
+  document.getElementById('settingsModal').classList.remove('visible');
+  render();
+  showToast('Poids enregistré');
+});
+
+// Edit modal
+document.getElementById('editSave').addEventListener('click', saveEditedDrink);
+document.getElementById('editDelete').addEventListener('click', () => {
+  if (confirm('Supprimer ce verre ?')) deleteDrink();
+});
+document.getElementById('editCancel').addEventListener('click', closeEditModal);
+
+// Tabs historique
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentPeriod = t.dataset.period;
+    renderHistory();
+  });
+});
+
+// Refresh BAC every 30s
+setInterval(() => {
+  if (drinks.length > 0) render();
+}, 30000);
+
+// Service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
+  });
+}
+
+// Synchronise la chip active avec currentType au chargement
+function syncChipsWithCurrentType() {
+  document.querySelectorAll('#chipsRow .chip').forEach(c => {
+    if (c.dataset.type === currentType) c.classList.add('active');
+    else c.classList.remove('active');
+  });
+}
+
+// Init
+loadSettings();
+loadToday();
+syncChipsWithCurrentType();
+document.getElementById('inputTime').value = getCurrentTimeStr();
+render();
+renderHistory();
+</script>
+</body>
+</html>
