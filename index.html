@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#fafaf7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tracker Vin">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Tracker Vin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f4f4f0;
+  --border: #e3e3dd;
+  --border-strong: #d0d0c8;
+  --text: #1a1a1f;
+  --text-2: #4a4a52;
+  --muted: #8a8a8a;
+  --accent: #6b8eb4;
+  --accent-soft: #a4bdd6;
+  --accent-bg: #ebf2f8;
+  --green: #4a9264;
+  --green-bg: #e8f3ec;
+  --yellow: #b89328;
+  --yellow-bg: #faf3df;
+  --orange: #c46a26;
+  --orange-bg: #fbeadb;
+  --red: #b73a3a;
+  --red-bg: #fbe7e7;
+  --red-deep: #7a1f1f;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  overscroll-behavior: none;
+  min-height: 100vh;
+}
+
+body {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 14px 14px 30px;
+  position: relative;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.head h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+.head .date {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ================================================
+   SELECTEUR DE VERRE EN HAUT
+   ================================================ */
+.entry-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.entry-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chips-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.chips-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.chip.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  font-weight: 500;
+}
+
+.fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.field-mini { display: flex; flex-direction: column; }
+.field-mini label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  padding-left: 2px;
+}
+.field-mini input {
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+}
+.field-mini input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.btn-record {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  color: #ffffff;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(167,109,63,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s;
+}
+.btn-record:active { transform: scale(0.97); }
+.btn-record .plus { font-size: 18px; font-weight: 800; }
+
+/* ================================================
+   GRANDE CARTE DERNIER VERRE
+   ================================================ */
+.last-drink-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  transition: background 0.2s;
+}
+.last-drink-card.no-data {
+  background: var(--green-bg);
+  border-color: var(--green);
+}
+.last-drink-card.recent {
+  background: var(--accent-bg);
+  border-color: var(--accent-soft);
+}
+.last-drink-card.streak {
+  background: var(--green-bg);
+  border-color: var(--green);
+}
+.last-drink-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.last-drink-body {
+  flex: 1;
+  min-width: 0;
+}
+.last-drink-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.last-drink-elapsed {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+.last-drink-time {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.last-drink-record {
+  margin-top: 6px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.last-drink-record:empty {
+  display: none;
+}
+.last-drink-record .lr-label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 9px;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.last-drink-record .lr-value {
+  color: var(--text-2);
+  font-weight: 500;
+}
+.last-drink-record .lr-current-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(74, 146, 100, 0.15);
+  color: var(--green);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+.last-drink-health {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-2);
+  font-style: italic;
+}
+.last-drink-health:empty {
+  display: none;
+}
+.last-drink-card.streak .last-drink-health {
+  color: var(--green);
+  border-top-color: var(--green);
+  opacity: 0.85;
+}
+.last-drink-card.recent .last-drink-health {
+  color: var(--accent);
+  border-top-color: var(--accent-soft);
+  opacity: 0.85;
+}
+.last-drink-card.streak .last-drink-elapsed,
+.last-drink-card.no-data .last-drink-elapsed {
+  color: var(--green);
+}
+.last-drink-card.recent .last-drink-elapsed {
+  color: var(--accent);
+}
+
+/* ================================================
+   MÉTRIQUES PRINCIPALES (3 en grand)
+   ================================================ */
+.main-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.main-metrics-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.main-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.main-card.alert {
+  background: var(--red-bg);
+  border-color: var(--red);
+}
+.main-card.alert .main-val,
+.main-card.alert .main-emoji {
+  color: var(--red);
+}
+.main-card.warn {
+  background: var(--orange-bg);
+  border-color: var(--orange);
+}
+.main-card.warn .main-val,
+.main-card.warn .main-emoji {
+  color: var(--orange);
+}
+.main-card.active {
+  background: var(--accent-bg);
+  border-color: var(--accent-soft);
+}
+.main-card.success {
+  background: var(--green-bg);
+  border-color: var(--green);
+}
+.main-card.success .main-val,
+.main-card.success .main-emoji {
+  color: var(--green);
+}
+.main-emoji {
+  font-size: 18px;
+  margin-bottom: 4px;
+  color: var(--text-2);
+}
+.main-label {
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+.main-val {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text);
+}
+.main-val.main-val-window {
+  font-size: 15px;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+.main-val .small {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 2px;
+}
+.main-sub {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.2;
+}
+
+/* Espace entre les deux lignes de main-metrics */
+.main-metrics + .main-metrics {
+  margin-top: 0;
+}
+
+/* ================================================
+   CARTE BAC SECONDAIRE (détails)
+   ================================================ */
+.bac-detail {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.bac-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.bac-sub { display: flex; flex-direction: column; }
+.bac-sub-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.bac-sub-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text);
+}
+.bac-sub-value .small {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 3px;
+}
+
+/* ================================================
+   CARTE PIC BAC — 4 fenêtres temporelles
+   ================================================ */
+.peak-bac-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.peak-bac-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.peak-bac-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.peak-bac-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 4px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+.peak-bac-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.peak-bac-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text);
+}
+.peak-bac-value .small {
+  font-size: 9px;
+  color: var(--muted);
+  margin-left: 2px;
+}
+
+/* ================================================
+   CARTE COÛT ALCOOL — graisse déstockée vs alcool
+   ================================================ */
+.cost-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.cost-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.cost-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+  gap: 4px;
+  align-items: center;
+}
+.cost-header {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-align: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.cost-row-label {
+  font-size: 10px;
+  color: var(--text-2);
+  line-height: 1.25;
+  padding: 6px 4px 6px 0;
+  font-weight: 500;
+}
+.cost-row-sub {
+  font-size: 8px;
+  color: var(--muted);
+  font-weight: 400;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.cost-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  padding: 6px 2px;
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+.cost-cell.positive { color: var(--green); }
+.cost-cell.negative { color: var(--accent); }
+.cost-cell.net { color: var(--text); font-weight: 600; }
+.cost-cell.net.gain { color: var(--green); }
+.cost-cell.net.loss { color: var(--red); }
+.cost-note {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ================================================
+   DÉFICIT CALORIQUE
+   ================================================ */
+.deficit-card {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.deficit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.deficit-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+}
+.deficit-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--accent);
+}
+.deficit-bar-wrap {
+  margin-top: 8px;
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.deficit-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.deficit-bar.warn { background: var(--orange); }
+.deficit-bar.danger { background: var(--red); }
+.deficit-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* ================================================
+   IMPACT MÉTABOLIQUE (déficit hydrique + eau à boire)
+   ================================================ */
+.metab-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.metab-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 13px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.metab-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.metab-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.1;
+  color: var(--text);
+}
+.metab-value .small {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 2px;
+}
+.metab-value.warn { color: var(--orange); }
+.metab-value.danger { color: var(--red); }
+.metab-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+/* Compteurs */
+.counter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.counter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.counter-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.counter-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text);
+}
+.counter-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Bouteilles */
+.bottles {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.bottles-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.bottles-label .l {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+}
+.bottles-label .r {
+  font-size: 11px;
+  color: var(--accent);
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+}
+.bottles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 30px;
+}
+.bottle { width: 22px; height: 30px; }
+.bottle.empty { opacity: 0.25; }
+.bottle svg { display: block; width: 100%; height: 100%; }
+
+/* Timeline */
+.timeline {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.timeline-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  padding-bottom: 4px;
+}
+.timeline-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding: 8px 6px;
+  border-bottom: 1px dashed var(--border);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.1s;
+}
+.timeline-item:active { background: var(--surface-2); }
+.timeline-item:last-child { border-bottom: none; }
+.timeline-item .t-hour { color: var(--accent); font-weight: 500; }
+.timeline-item .t-info { color: var(--muted); font-size: 11px; }
+.timeline-item .t-edit { color: var(--muted); font-size: 11px; margin-left: 6px; }
+.timeline-empty {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* Warning baclo */
+.warning {
+  background: var(--orange-bg);
+  border: 1px solid var(--orange);
+  border-radius: 12px;
+  padding: 11px 14px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text);
+  display: none;
+}
+.warning.visible { display: block; }
+.warning strong {
+  color: var(--orange);
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Streak */
+.streak {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.streak-text {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.streak-value {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 10px;
+}
+.tab {
+  flex: 1;
+  padding: 7px;
+  text-align: center;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+.tab.active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.history-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  min-height: 80px;
+  max-height: 360px;
+  overflow-y: auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.history-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 12px;
+  align-items: center;
+}
+.history-row:last-child { border-bottom: none; }
+.history-row .h-date { color: var(--text); }
+.history-row .h-vol { color: var(--accent); font-weight: 500; }
+.history-row .h-bac { color: var(--muted); font-size: 11px; }
+.history-totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 11px;
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.history-totals .t { text-align: center; }
+.history-totals .t-l {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.history-totals .t-v {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Bouton paramètres */
+.settings-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.settings-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text-2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.settings-btn:active { background: var(--surface-2); }
+.settings-btn.primary {
+  background: var(--accent-bg);
+  border-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* Modal */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,20,25,0.4);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-bg.visible { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+.modal h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 17px;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.modal p.sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.field {
+  margin-bottom: 12px;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.field input, .field select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.fields-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+.btn.danger {
+  background: var(--red);
+  color: #ffffff;
+  border-color: var(--red);
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 110;
+  pointer-events: none;
+}
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 16px 4px 8px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+/* ============ MODAL DÉTAIL JOUR (utilise .modal-bilan, .bilan-head, .bilan-close) ============ */
+.modal-bilan {
+  max-width: 460px !important;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.bilan-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.bilan-close {
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  color: var(--text-2);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bilan-close:active { background: var(--border); }
+
+
+/* ============ MODAL DÉTAIL JOUR ============ */
+.history-row {
+  cursor: pointer;
+  transition: background 0.1s;
+  border-radius: 6px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+.history-row:active { background: var(--surface-2); }
+.history-row .h-arrow {
+  color: var(--muted);
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.dd-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.dd-stat {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.dd-stat-l {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.dd-stat-v {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.dd-list-label {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 8px;
+}
+.dd-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.dd-list .timeline-item:active { background: var(--surface-2); }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>Tracker Vin</h1>
+  <div class="date" id="dateLabel">—</div>
+</div>
+
+<!-- ============ GRANDE CARTE DERNIER VERRE (tout en haut) ============ -->
+<div class="last-drink-card" id="lastDrinkCard">
+  <div class="last-drink-icon">🍷</div>
+  <div class="last-drink-body">
+    <div class="last-drink-label">Dernier verre</div>
+    <div class="last-drink-elapsed" id="lastDrinkElapsed">Aucun verre enregistré</div>
+    <div class="last-drink-time" id="lastDrinkTime">—</div>
+    <div class="last-drink-record" id="lastDrinkRecord"></div>
+    <div class="last-drink-health" id="lastDrinkHealth"></div>
+  </div>
+</div>
+
+<!-- ============ SÉLECTEUR DE VERRE ============ -->
+<div class="entry-card">
+  <div class="entry-title">🍷 Nouveau verre</div>
+  
+  <div class="chips-row" id="chipsRow">
+    <button class="chip active" data-type="vin_blanc">Vin blanc</button>
+    <button class="chip" data-type="vin_rouge">Vin rouge</button>
+    <button class="chip" data-type="vin_rose">Vin rosé</button>
+    <button class="chip" data-type="champagne">Champagne</button>
+    <button class="chip" data-type="biere">Bière</button>
+    <button class="chip" data-type="spiritueux">Spiritueux</button>
+    <button class="chip" data-type="autre">Autre</button>
+  </div>
+  
+  <div class="fields-grid">
+    <div class="field-mini">
+      <label>Volume (cl)</label>
+      <input type="number" id="inputVolume" min="1" max="200" step="1" value="20">
+    </div>
+    <div class="field-mini">
+      <label>Degré (°)</label>
+      <input type="number" id="inputDegree" min="0" max="80" step="0.5" value="12">
+    </div>
+    <div class="field-mini">
+      <label>Heure</label>
+      <input type="time" id="inputTime">
+    </div>
+  </div>
+  
+  <button class="btn-record" id="addBtn">
+    <span class="plus">+</span>
+    <span>Enregistrer le verre</span>
+  </button>
+</div>
+
+<!-- ============ LIGNE PRINCIPALE : Alcoolémie · Retour à 0 g/L ============ -->
+<div class="main-metrics main-metrics-2">
+  <!-- BAC -->
+  <div class="main-card" id="bacCard">
+    <div class="main-emoji">🩸</div>
+    <div class="main-label">Alcoolémie</div>
+    <div class="main-val"><span id="bacValue">0,00</span><span class="small">g/L</span></div>
+    <div class="main-sub" id="bacSub">Conduite OK</div>
+  </div>
+  <!-- Retour à 0 g/L -->
+  <div class="main-card" id="zeroCard">
+    <div class="main-emoji">⏱</div>
+    <div class="main-label">Retour à 0 g/L</div>
+    <div class="main-val main-val-window" id="zeroTime">—</div>
+    <div class="main-sub" id="zeroSub">—</div>
+  </div>
+</div>
+
+<!-- BOUTEILLES — équivalent du jour, sous Alcoolémie/Retour à 0 -->
+<div class="bottles">
+  <div class="bottles-label">
+    <span class="l">Équivalent bouteilles aujourd'hui</span>
+    <span class="r" id="bottleFraction">0 / 75 cl</span>
+  </div>
+  <div class="bottles-row" id="bottlesRow"></div>
+</div>
+
+<!-- ============ GRANDE CARTE DÉTAILS ============ -->
+<div class="bac-detail">
+  <div class="bac-detail-grid">
+    <div class="bac-sub">
+      <div class="bac-sub-label">Alcool dans le sang</div>
+      <div class="bac-sub-value"><span id="bacGrams">0</span><span class="small">g</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Alcool métabolisé</div>
+      <div class="bac-sub-value"><span id="metabGrams">0</span><span class="small">g</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Lipolyse : durée</div>
+      <div class="bac-sub-value" id="lipoDuration">—</div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Ingéré aujourd'hui</div>
+      <div class="bac-sub-value" id="purGrams">0<span class="small"> g</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Déficit hydrique</div>
+      <div class="bac-sub-value"><span id="waterValue">0</span><span class="small">mL</span></div>
+    </div>
+    <div class="bac-sub">
+      <div class="bac-sub-label">Lipides oxydés (depuis BAC=0)</div>
+      <div class="bac-sub-value" id="lipidsOxidized">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CARTE PIC BAC — 4 fenêtres temporelles ============ -->
+<div class="peak-bac-card">
+  <div class="peak-bac-title">📈 Pic BAC par période</div>
+  <div class="peak-bac-grid">
+    <div class="peak-bac-cell">
+      <div class="peak-bac-label">Jour</div>
+      <div class="peak-bac-value" id="peakBacDay">—</div>
+    </div>
+    <div class="peak-bac-cell">
+      <div class="peak-bac-label">Semaine</div>
+      <div class="peak-bac-value" id="peakBacWeek">—</div>
+    </div>
+    <div class="peak-bac-cell">
+      <div class="peak-bac-label">Mois</div>
+      <div class="peak-bac-value" id="peakBacMonth">—</div>
+    </div>
+    <div class="peak-bac-cell">
+      <div class="peak-bac-label">Année</div>
+      <div class="peak-bac-value" id="peakBacYear">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CARTE COÛT ALCOOL — graisse déstockée vs calories alcool ============ -->
+<div class="cost-card">
+  <div class="cost-title">💸 Coût net de l'alcool</div>
+  <div class="cost-grid">
+    <!-- Ligne d'en-tête : périodes -->
+    <div class="cost-header"></div>
+    <div class="cost-header">24h</div>
+    <div class="cost-header">Semaine</div>
+    <div class="cost-header">Mois</div>
+    <div class="cost-header">Année</div>
+    
+    <!-- Ligne 1 : Graisse déstockée -->
+    <div class="cost-row-label">Graisse déstockée<br><span class="cost-row-sub">heures BAC=0 × 3,6 g/h</span></div>
+    <div class="cost-cell positive" id="fatDay">—</div>
+    <div class="cost-cell positive" id="fatWeek">—</div>
+    <div class="cost-cell positive" id="fatMonth">—</div>
+    <div class="cost-cell positive" id="fatYear">—</div>
+    
+    <!-- Ligne 2 : Calories alcool ingérées -->
+    <div class="cost-row-label">Calories alcool<br><span class="cost-row-sub">7 kcal/g éthanol</span></div>
+    <div class="cost-cell negative" id="kcalDay">—</div>
+    <div class="cost-cell negative" id="kcalWeek">—</div>
+    <div class="cost-cell negative" id="kcalMonth">—</div>
+    <div class="cost-cell negative" id="kcalYear">—</div>
+    
+    <!-- Ligne 3 : Solde net (graisse en kcal − alcool kcal) -->
+    <div class="cost-row-label">Solde net<br><span class="cost-row-sub">graisse (kcal) − alcool</span></div>
+    <div class="cost-cell net" id="netDay">—</div>
+    <div class="cost-cell net" id="netWeek">—</div>
+    <div class="cost-cell net" id="netMonth">—</div>
+    <div class="cost-cell net" id="netYear">—</div>
+  </div>
+  <div class="cost-note">
+    Estimation au repos : 1 g graisse = 9 kcal. Le solde net = ce qui aurait été perdu en graisse s'il n'y avait pas eu d'alcool, moins le coût énergétique de l'alcool consommé. Indicatif, pas une mesure réelle.
+  </div>
+</div>
+
+<!-- WARNING BACLOFENE -->
+<div class="warning" id="baclofWarning">
+  <strong>⚠ Règle baclofène</strong>
+  Dose du soir : <b>uniquement au coucher</b>, jamais en complément de la prise de 18h.
+</div>
+
+<!-- COMPTEUR DU JOUR CALENDAIRE -->
+<div class="counter-row" style="grid-template-columns: 1fr;">
+  <div class="counter-card">
+    <div class="counter-label">Verres aujourd'hui</div>
+    <div class="counter-value" id="glassCount">0</div>
+    <div class="counter-sub" id="volTotal">0 cl ingérés</div>
+  </div>
+</div>
+
+<!-- STREAK -->
+<div class="streak">
+  <span class="streak-text">Jours consécutifs sans alcool</span>
+  <span class="streak-value" id="streakValue">0</span>
+</div>
+
+<!-- TIMELINE -->
+<div class="timeline">
+  <div class="timeline-label">Verres aujourd'hui — touche pour modifier</div>
+  <div id="timelineContent">
+    <div class="timeline-empty">Aucun verre enregistré</div>
+  </div>
+</div>
+
+<!-- HISTORIQUE -->
+<div class="section-title">Historique</div>
+<div class="tabs">
+  <button class="tab active" data-period="day">Jour</button>
+  <button class="tab" data-period="week">Semaine</button>
+  <button class="tab" data-period="month">Mois</button>
+  <button class="tab" data-period="year">Année</button>
+</div>
+<div class="history-totals">
+  <div class="t"><div class="t-l">Verres</div><div class="t-v" id="totGlasses">0</div></div>
+  <div class="t"><div class="t-l">Volume</div><div class="t-v" id="totVolume">0 cl</div></div>
+  <div class="t"><div class="t-l">Btl. eq.</div><div class="t-v" id="totBottles">0</div></div>
+</div>
+<div class="history-list" id="historyList"></div>
+
+<!-- BOUTON PARAMÈTRES -->
+<div class="settings-row">
+  <button class="settings-btn" id="settingsBtn">⚙ Paramètres</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ MODAL PARAMÈTRES ============ -->
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h2>Paramètres</h2>
+    <p class="sub">Calibration personnelle.</p>
+    <div class="field">
+      <label>Poids corporel actuel (kg)</label>
+      <input type="number" id="weight" min="30" max="200" step="0.1">
+    </div>
+    <div class="field">
+      <label>Poids objectif (kg)</label>
+      <input type="number" id="weightTarget" min="30" max="200" step="0.1">
+    </div>
+    <div class="field">
+      <label>Objectif kcal alcool / jour</label>
+      <input type="number" id="goalKcal" min="0" max="5000" step="50">
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;">
+        Référence OMS faible risque ≈ 100 kcal/j.<br>
+        Suggestion adaptée à ton plan 1750 kcal/j : 500 kcal/j max.
+      </div>
+    </div>
+    <div class="field" style="font-size:11px;color:var(--muted);line-height:1.5;">
+      <strong style="color:var(--text);font-size:11px;">Modèle d'alcoolémie</strong><br>
+      r = 0,68 (homme) · Élimination : 0,15 g/L/h<br>
+      BAC = (alcool en g) / (poids × r)<br>
+      Seuil légal conduite : 0,5 g/L
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="settingsCancel">Annuler</button>
+      <button class="btn primary" id="settingsSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ MODAL ÉDITION VERRE ============ -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h2>Modifier ce verre</h2>
+    <p class="sub" id="editSub">—</p>
+    <div class="fields-2col">
+      <div class="field">
+        <label>Volume (cl)</label>
+        <input type="number" id="editVolume" min="1" max="200" step="1">
+      </div>
+      <div class="field">
+        <label>Degré (°)</label>
+        <input type="number" id="editDegree" min="0" max="80" step="0.5">
+      </div>
+    </div>
+    <div class="fields-2col">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="editDate">
+      </div>
+      <div class="field">
+        <label>Heure</label>
+        <input type="time" id="editTime">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn danger" id="editDelete">Supprimer</button>
+      <button class="btn" id="editCancel">Annuler</button>
+      <button class="btn primary" id="editSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL DÉTAIL D'UN JOUR PASSÉ ============ -->
+<div class="modal-bg" id="dayDetailModal">
+  <div class="modal modal-bilan">
+    <div class="bilan-head">
+      <h2 id="dayDetailTitle">Verres du jour</h2>
+      <button class="bilan-close" id="dayDetailClose">✕</button>
+    </div>
+    
+    <div class="dd-stats-row" id="dayDetailStats"></div>
+    
+    <div class="dd-list-label">Verres enregistrés — touche pour modifier ou supprimer</div>
+    <div class="dd-list" id="dayDetailList"></div>
+  </div>
+</div>
+
+
+<script>
+// ============ CONSTANTES ============
+const DRINK_TYPES = {
+  vin_blanc: { label: 'Vin blanc', defaultDegre: 12 },
+  vin_rouge: { label: 'Vin rouge', defaultDegre: 13 },
+  vin_rose: { label: 'Vin rosé', defaultDegre: 12 },
+  champagne: { label: 'Champagne', defaultDegre: 12 },
+  biere: { label: 'Bière', defaultDegre: 5 },
+  spiritueux: { label: 'Spiritueux', defaultDegre: 40 },
+  autre: { label: 'Autre', defaultDegre: 12 }
+};
+const R_HOMME = 0.68;
+const ELIM_RATE = 0.15;
+const DENSITE_ETHANOL = 0.8;
+const BAC_LEGAL = 0.5; // seuil légal France pour la conduite
+const STORAGE_PREFIX = 'wineTracker_';
+const DAILY_KCAL_GOAL = 1750;
+
+let settings = { weight: 78.4, weightTarget: 67, goalKcal: 500 };
+let drinks = []; // verres du jour calendaire en cours
+let currentType = 'vin_blanc';
+let editingDrinkId = null;
+let currentPeriod = 'day';
+
+// ============ STORAGE ============
+function dateKeyStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function todayKey() {
+  return `${STORAGE_PREFIX}drinks_${dateKeyStr(new Date())}`;
+}
+function dateKey(d) {
+  return `${STORAGE_PREFIX}drinks_${dateKeyStr(d)}`;
+}
+function loadSettings() {
+  try {
+    const v = localStorage.getItem(STORAGE_PREFIX + 'settings');
+    if (v) {
+      const parsed = JSON.parse(v);
+      settings.weight = parsed.weight || 78.4;
+      settings.weightTarget = parsed.weightTarget !== undefined ? parsed.weightTarget : 67;
+      settings.goalKcal = parsed.goalKcal !== undefined ? parsed.goalKcal : 500;
+      if (parsed.lastType && DRINK_TYPES[parsed.lastType]) currentType = parsed.lastType;
+      if (parsed.lastVolume) document.getElementById('inputVolume').value = parsed.lastVolume;
+      if (parsed.lastDegree) document.getElementById('inputDegree').value = parsed.lastDegree;
+    }
+  } catch (e) {}
+}
+function saveSettings() {
+  try {
+    const obj = {
+      weight: settings.weight,
+      weightTarget: settings.weightTarget,
+      goalKcal: settings.goalKcal,
+      lastType: currentType,
+      lastVolume: parseInt(document.getElementById('inputVolume').value) || 20,
+      lastDegree: parseFloat(document.getElementById('inputDegree').value) || 12
+    };
+    localStorage.setItem(STORAGE_PREFIX + 'settings', JSON.stringify(obj));
+  } catch (e) {}
+}
+function loadToday() {
+  try {
+    const v = localStorage.getItem(todayKey());
+    drinks = v ? JSON.parse(v) : [];
+  } catch (e) { drinks = []; }
+}
+function saveToday() {
+  try { localStorage.setItem(todayKey(), JSON.stringify(drinks)); } catch (e) {}
+}
+
+// Récupère TOUS les verres dans une fenêtre temporelle quelconque
+function getDrinksInWindow(fromDate, toDate) {
+  const result = [];
+  // On parcourt les clés des 3 derniers jours max (suffisant pour une fenêtre 24h)
+  const startDay = new Date(fromDate);
+  startDay.setHours(0,0,0,0);
+  startDay.setDate(startDay.getDate() - 1); // marge de sécurité
+  const endDay = new Date(toDate);
+  endDay.setHours(0,0,0,0);
+  for (let d = new Date(startDay); d <= endDay; d.setDate(d.getDate() + 1)) {
+    const key = dateKey(d);
+    const v = localStorage.getItem(key);
+    if (!v) continue;
+    try {
+      const arr = JSON.parse(v);
+      for (const dr of arr) {
+        const t = new Date(dr.time);
+        if (t >= fromDate && t <= toDate) result.push(dr);
+      }
+    } catch (e) {}
+  }
+  return result;
+}
+
+// ============ CALCULS ============
+function alcoolPurGrammes(volumeML, degre) {
+  return volumeML * (degre/100) * DENSITE_ETHANOL;
+}
+function computeBAC(drinksList, now) {
+  if (!drinksList.length) return { bac: 0, ingestedG: 0, inBloodG: 0, metabolizedG: 0, lastTime: null, firstTime: null };
+  const sorted = [...drinksList].sort((a,b) => new Date(a.time) - new Date(b.time));
+  
+  // ÉTAPE 1 : trouver le début du cycle actif
+  // = premier verre qui appartient à une séquence continue où le BAC n'est jamais retombé à 0
+  // On simule le BAC verre par verre et on note les moments où il repasse à 0
+  let bacSim = 0, lastSimT = null;
+  let cycleStartIdx = 0; // index du premier verre du cycle actuel
+  for (let i = 0; i < sorted.length; i++) {
+    const t = new Date(sorted[i].time);
+    if (lastSimT) {
+      const dt = (t - lastSimT) / 3600000;
+      const newBac = bacSim - ELIM_RATE * dt;
+      // Si le BAC est tombé à 0 avant ce verre, on démarre un nouveau cycle ici
+      if (newBac <= 0) {
+        cycleStartIdx = i;
+        bacSim = 0;
+      } else {
+        bacSim = newBac;
+      }
+    }
+    const ap = alcoolPurGrammes(sorted[i].volumeML, sorted[i].degre);
+    bacSim += ap / (settings.weight * R_HOMME);
+    lastSimT = t;
+  }
+  
+  // ÉTAPE 2 : calcul réel sur le cycle actif uniquement
+  const activeCycle = sorted.slice(cycleStartIdx);
+  let bac = 0, lastT = null, ingested = 0;
+  const firstT = new Date(activeCycle[0].time);
+  for (const d of activeCycle) {
+    const t = new Date(d.time);
+    if (lastT) {
+      const dt = (t - lastT) / 3600000;
+      bac = Math.max(0, bac - ELIM_RATE * dt);
+    }
+    const ap = alcoolPurGrammes(d.volumeML, d.degre);
+    ingested += ap;
+    bac += ap / (settings.weight * R_HOMME);
+    lastT = t;
+  }
+  if (lastT) {
+    const dt = (now - lastT) / 3600000;
+    bac = Math.max(0, bac - ELIM_RATE * dt);
+  }
+  const inBlood = bac * settings.weight * R_HOMME;
+  const metabolized = Math.max(0, ingested - inBlood);
+  return { bac, ingestedG: ingested, inBloodG: inBlood, metabolizedG: metabolized, lastTime: lastT, firstTime: firstT };
+}
+
+// ============ FORMAT ============
+function formatDate(d) {
+  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+}
+function formatTime(d) {
+  if (!d) return '—';
+  return `${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function formatBAC(v) { return v.toFixed(2).replace('.', ','); }
+
+function timeStrToISO(timeStr, baseDate) {
+  baseDate = baseDate || new Date();
+  const [h, m] = timeStr.split(':').map(Number);
+  const d = new Date(baseDate);
+  d.setHours(h || 0, m || 0, 0, 0);
+  return d.toISOString();
+}
+function getCurrentTimeStr() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ============ AFFICHAGE ============
+function renderBottles(totalCL) {
+  const fullBottles = Math.floor(totalCL / 75);
+  const remainCL = totalCL % 75;
+  const fillRatio = remainCL / 75;
+  const row = document.getElementById('bottlesRow');
+  row.innerHTML = '';
+  for (let i = 0; i < fullBottles; i++) row.appendChild(bottleSVG(1));
+  if (totalCL > 0 || fullBottles === 0) row.appendChild(bottleSVG(fillRatio));
+  document.getElementById('bottleFraction').textContent = fullBottles > 0
+    ? `${fullBottles} btl + ${Math.round(remainCL)} cl`
+    : `${Math.round(remainCL)} / 75 cl`;
+}
+function bottleSVG(fillRatio) {
+  const div = document.createElement('div');
+  div.className = 'bottle' + (fillRatio === 0 ? ' empty' : '');
+  const fillH = Math.max(0, Math.min(1, fillRatio)) * 18;
+  const fillY = 26 - fillH;
+  div.innerHTML = `
+    <svg viewBox="0 0 22 30">
+      <rect x="9" y="2" width="4" height="6" fill="#9a9a92" stroke="#7a7a72" stroke-width="0.5"/>
+      <path d="M 7 8 Q 6 10 6 12 L 6 26 Q 6 28 8 28 L 14 28 Q 16 28 16 26 L 16 12 Q 16 10 15 8 Z" 
+            fill="#e8e8e2" stroke="#9a9a92" stroke-width="0.5"/>
+      <rect x="6" y="${fillY}" width="10" height="${fillH}" fill="#a76d3f" opacity="0.85"/>
+    </svg>`;
+  return div;
+}
+
+function renderTimeline() {
+  const c = document.getElementById('timelineContent');
+  if (!drinks.length) {
+    c.innerHTML = '<div class="timeline-empty">Aucun verre enregistré</div>';
+    return;
+  }
+  const sorted = [...drinks].sort((a,b) => new Date(b.time) - new Date(a.time));
+  c.innerHTML = sorted.map((d, i) => {
+    const t = new Date(d.time);
+    const typeLabel = d.type && DRINK_TYPES[d.type] ? DRINK_TYPES[d.type].label : '—';
+    return `<div class="timeline-item" data-id="${d.id}">
+      <span><span class="t-hour">${formatTime(t)}</span> <span class="t-info">· ${sorted.length - i}e verre</span></span>
+      <span class="t-info">${d.volumeML/10} cl · ${typeLabel} ${d.degre}° <span class="t-edit">✎</span></span>
+    </div>`;
+  }).join('');
+  c.querySelectorAll('.timeline-item').forEach(el => {
+    el.addEventListener('click', () => openEditModal(parseInt(el.dataset.id)));
+  });
+}
+
+function showBaclofeneWarning() {
+  if (!drinks.length) {
+    document.getElementById('baclofWarning').classList.remove('visible');
+    return;
+  }
+  const sorted = [...drinks].sort((a,b) => new Date(b.time) - new Date(a.time));
+  const last = new Date(sorted[0].time);
+  const h = last.getHours();
+  if (h >= 16 && h <= 22) {
+    document.getElementById('baclofWarning').classList.add('visible');
+  } else {
+    document.getElementById('baclofWarning').classList.remove('visible');
+  }
+}
+
+function computeStreak() {
+  let streak = 0;
+  if (drinks.length > 0) {
+    document.getElementById('streakValue').textContent = '0';
+    return;
+  }
+  const start = new Date();
+  for (let i = 1; i < 365; i++) {
+    const d = new Date(start);
+    d.setDate(d.getDate() - i);
+    const v = localStorage.getItem(dateKey(d));
+    if (v) {
+      try {
+        const arr = JSON.parse(v);
+        if (arr.length > 0) break;
+      } catch (e) { break; }
+    }
+    streak++;
+  }
+  document.getElementById('streakValue').textContent = streak;
+}
+
+// ============ TOUS LES VERRES DE L'HISTORIQUE (triés) ============
+function getAllDrinksSorted() {
+  const all = [];
+  // Historique localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(STORAGE_PREFIX + 'drinks_')) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(key));
+      if (!arr || !arr.length) continue;
+      // Évite de dupliquer les verres d'aujourd'hui (déjà dans `drinks`)
+      const dKey = key.replace(STORAGE_PREFIX + 'drinks_', '');
+      if (dKey === dateKeyStr(new Date())) continue;
+      for (const dr of arr) {
+        const t = new Date(dr.time);
+        if (!isNaN(t.getTime())) all.push(dr);
+      }
+    } catch (e) {}
+  }
+  // Verres du jour en cours
+  for (const dr of drinks) {
+    const t = new Date(dr.time);
+    if (!isNaN(t.getTime())) all.push(dr);
+  }
+  all.sort((a, b) => new Date(a.time) - new Date(b.time));
+  return all;
+}
+
+// ============ RECORD D'ABSTINENCE ============
+// Retourne { recordMs, currentMs, isCurrentRecord }
+// Le record = la plus longue série jamais atteinte entre 2 verres consécutifs
+// La série en cours = depuis le dernier verre jusqu'à maintenant
+function computeAbstinenceRecord() {
+  const all = getAllDrinksSorted();
+  if (!all.length) return { recordMs: 0, currentMs: 0, isCurrentRecord: false };
+  
+  let maxGapMs = 0;
+  for (let i = 1; i < all.length; i++) {
+    const gap = new Date(all[i].time) - new Date(all[i - 1].time);
+    if (gap > maxGapMs) maxGapMs = gap;
+  }
+  const lastDrinkTime = new Date(all[all.length - 1].time);
+  const currentMs = new Date() - lastDrinkTime;
+  const isCurrentRecord = currentMs > maxGapMs;
+  const recordMs = Math.max(maxGapMs, currentMs);
+  return { recordMs, currentMs, isCurrentRecord };
+}
+
+// ============ MOMENT DU DERNIER DÉBLOCAGE LIPOLYSE (BAC repassé à 0) ============
+// Simule l'évolution du BAC sur tout l'historique et retourne la dernière fois
+// où le BAC a atteint 0 après une période > 0. Retourne null si BAC actuellement > 0
+// ou si pas de verre récent.
+function getLastDeblockTime() {
+  const all = getAllDrinksSorted();
+  if (!all.length) return null;
+  
+  let bacSim = 0;
+  let lastSimT = null;
+  let lastDeblock = null;
+  const weight = settings.weight;
+  
+  for (let i = 0; i < all.length; i++) {
+    const t = new Date(all[i].time);
+    if (lastSimT) {
+      const dt = (t - lastSimT) / 3600000;
+      const newBac = bacSim - ELIM_RATE * dt;
+      if (newBac <= 0 && bacSim > 0) {
+        // Le BAC est passé à 0 entre lastSimT et t
+        const hoursToZero = bacSim / ELIM_RATE;
+        lastDeblock = new Date(lastSimT.getTime() + hoursToZero * 3600000);
+        bacSim = 0;
+      } else {
+        bacSim = Math.max(0, newBac);
+      }
+    }
+    const ap = alcoolPurGrammes(all[i].volumeML, all[i].degre);
+    bacSim += ap / (weight * R_HOMME);
+    lastSimT = t;
+  }
+  // Après le dernier verre : vérifier si le BAC est arrivé à 0 avant maintenant
+  if (lastSimT && bacSim > 0) {
+    const hoursToZero = bacSim / ELIM_RATE;
+    const zeroTime = new Date(lastSimT.getTime() + hoursToZero * 3600000);
+    if (zeroTime <= new Date()) {
+      lastDeblock = zeroTime;
+    } else {
+      // BAC encore > 0 actuellement → pas de déblocage à montrer
+      return null;
+    }
+  }
+  return lastDeblock;
+}
+
+// ============ PIC BAC SUR UNE FENÊTRE TEMPORELLE ============
+// Calcule le BAC maximal observé après chaque verre survenu dans la fenêtre [startDate, endDate]
+function computePeakBacInRange(startDate, endDate) {
+  const all = getAllDrinksSorted();
+  if (!all.length) return 0;
+  
+  let peak = 0;
+  // Pour chaque verre ∈ fenêtre, simuler le BAC à l'instant juste après ce verre
+  // (on utilise tous les verres antérieurs ou égaux pour la simulation)
+  for (let i = 0; i < all.length; i++) {
+    const t = new Date(all[i].time);
+    if (t < startDate || t > endDate) continue;
+    const slice = all.slice(0, i + 1);
+    const rAt = computeBAC(slice, t);
+    if (rAt.bac > peak) peak = rAt.bac;
+  }
+  return peak;
+}
+
+// ============ FORMAT DURÉE ADAPTATIVE ============
+// Renvoie ex: "2 ans 3 mois", "5 mois 12 j", "3 jours 7 h", "8 h 22 min", "42 min"
+function formatDurationAdaptive(ms) {
+  if (ms < 0) ms = 0;
+  const minutes = Math.floor(ms / 60000);
+  const hours = Math.floor(ms / 3600000);
+  const days = Math.floor(ms / (24 * 3600000));
+  const months = Math.floor(days / 30.44);
+  const years = Math.floor(days / 365.25);
+  
+  if (years >= 1) {
+    const remainMonths = Math.floor((days - years * 365.25) / 30.44);
+    return `${years} an${years > 1 ? 's' : ''}${remainMonths > 0 ? ` ${remainMonths} mois` : ''}`;
+  } else if (months >= 1) {
+    const remainDays = days - Math.floor(months * 30.44);
+    return `${months} mois${remainDays > 0 ? ` ${remainDays} j` : ''}`;
+  } else if (days >= 1) {
+    const remainHours = hours - days * 24;
+    return `${days} jour${days > 1 ? 's' : ''}${remainHours > 0 ? ` ${remainHours} h` : ''}`;
+  } else if (hours >= 1) {
+    const remainMin = minutes - hours * 60;
+    return `${hours} h${remainMin > 0 ? ` ${remainMin} min` : ''}`;
+  } else {
+    return `${minutes} min`;
+  }
+}
+
+// ============ COÛT ALCOOL SUR UNE FENÊTRE TEMPORELLE ============
+// Retourne :
+//   - calAlcohol : kcal d'alcool ingéré dans la période (7 kcal/g éthanol)
+//   - fatDestockedG : graisse déstockée pendant les heures où le BAC = 0 dans la période
+//                     (heures libres × 3,6 g/h, oxydation lipidique au repos)
+//   - fatDestockedKcal : équivalent en kcal (1 g graisse = 9 kcal)
+//   - netKcal : graisse_kcal − alcool_kcal
+//     · positif (gain) = la lipolyse libre > coût alcool
+//     · négatif (perte) = l'alcool > déstockage
+function computeAlcoholCostInRange(startDate, endDate) {
+  const all = getAllDrinksSorted();
+  const LIPID_OX_RATE_GH = 3.6;   // g/h au repos
+  const KCAL_PER_G_ALCOHOL = 7;
+  const KCAL_PER_G_FAT = 9;
+  
+  // Calories alcool — somme des verres tombant dans la période
+  let calAlcohol = 0;
+  for (const d of all) {
+    const t = new Date(d.time);
+    if (t >= startDate && t <= endDate) {
+      calAlcohol += alcoolPurGrammes(d.volumeML, d.degre) * KCAL_PER_G_ALCOHOL;
+    }
+  }
+  
+  // Construction des cycles de BAC > 0 sur tout l'historique
+  // Un cycle = [début_premier_verre, moment_où_BAC_revient_à_0]
+  let bacSim = 0;
+  let lastSimT = null;
+  let cycleStart = null;
+  const cycles = [];
+  
+  for (let i = 0; i < all.length; i++) {
+    const t = new Date(all[i].time);
+    if (lastSimT) {
+      const dt = (t - lastSimT) / 3600000;
+      const newBac = bacSim - ELIM_RATE * dt;
+      if (newBac <= 0 && bacSim > 0) {
+        // BAC revenu à 0 quelque part entre lastSimT et t → fin du cycle
+        const hoursToZero = bacSim / ELIM_RATE;
+        const cycleEnd = new Date(lastSimT.getTime() + hoursToZero * 3600000);
+        cycles.push({ start: cycleStart, end: cycleEnd });
+        cycleStart = null;
+        bacSim = 0;
+      } else {
+        bacSim = Math.max(0, newBac);
+      }
+    }
+    if (cycleStart === null) cycleStart = t;
+    const ap = alcoolPurGrammes(all[i].volumeML, all[i].degre);
+    bacSim += ap / (settings.weight * R_HOMME);
+    lastSimT = t;
+  }
+  // Cycle final éventuel
+  if (cycleStart !== null && lastSimT) {
+    const hoursToZero = bacSim / ELIM_RATE;
+    const cycleEnd = new Date(lastSimT.getTime() + hoursToZero * 3600000);
+    cycles.push({ start: cycleStart, end: cycleEnd });
+  }
+  
+  // Heures où BAC > 0 dans [startDate, endDate]
+  let blockedHours = 0;
+  for (const c of cycles) {
+    const ovS = c.start > startDate ? c.start : startDate;
+    const ovE = c.end < endDate ? c.end : endDate;
+    if (ovE > ovS) {
+      blockedHours += (ovE - ovS) / 3600000;
+    }
+  }
+  
+  // Heures libres dans la période (BAC = 0)
+  const periodHours = Math.max(0, (endDate - startDate) / 3600000);
+  const freeHours = Math.max(0, periodHours - blockedHours);
+  
+  const fatDestockedG = freeHours * LIPID_OX_RATE_GH;
+  const fatDestockedKcal = fatDestockedG * KCAL_PER_G_FAT;
+  const netKcal = fatDestockedKcal - calAlcohol;
+  
+  return { calAlcohol, fatDestockedG, fatDestockedKcal, netKcal, blockedHours, freeHours };
+}
+
+// ============ RENDU DE LA CARTE COÛT ALCOOL ============
+function renderAlcoholCost(now) {
+  // Jour = 24h glissantes (cohérent avec le calcul du BAC en temps réel)
+  // Semaine / Mois / Année restent en calendaire pour avoir un sens de bilan
+  const day24hStart = new Date(now.getTime() - 24 * 3600000);
+  const dow = (now.getDay() + 6) % 7;
+  const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  
+  const day = computeAlcoholCostInRange(day24hStart, now);
+  const week = computeAlcoholCostInRange(weekStart, now);
+  const month = computeAlcoholCostInRange(monthStart, now);
+  const year = computeAlcoholCostInRange(yearStart, now);
+  
+  // Format graisse : compact en g ou kg
+  const fmtFat = (g) => {
+    if (g < 1) return '—';
+    if (g >= 1000) return `${(g / 1000).toFixed(1).replace('.', ',')} kg`;
+    if (g >= 100) return `${Math.round(g)} g`;
+    return `${g.toFixed(0)} g`;
+  };
+  // Format kcal : avec séparateur milliers et signe
+  const fmtKcal = (k, signed) => {
+    if (Math.abs(k) < 1) return '—';
+    const abs = Math.round(Math.abs(k));
+    const str = abs.toLocaleString('fr-FR');
+    if (!signed) return `${str} kcal`;
+    return `${k >= 0 ? '+' : '−'}${str} kcal`;
+  };
+  
+  document.getElementById('fatDay').textContent = fmtFat(day.fatDestockedG);
+  document.getElementById('fatWeek').textContent = fmtFat(week.fatDestockedG);
+  document.getElementById('fatMonth').textContent = fmtFat(month.fatDestockedG);
+  document.getElementById('fatYear').textContent = fmtFat(year.fatDestockedG);
+  
+  document.getElementById('kcalDay').textContent = day.calAlcohol > 0 ? fmtKcal(day.calAlcohol, false) : '—';
+  document.getElementById('kcalWeek').textContent = week.calAlcohol > 0 ? fmtKcal(week.calAlcohol, false) : '—';
+  document.getElementById('kcalMonth').textContent = month.calAlcohol > 0 ? fmtKcal(month.calAlcohol, false) : '—';
+  document.getElementById('kcalYear').textContent = year.calAlcohol > 0 ? fmtKcal(year.calAlcohol, false) : '—';
+  
+  const setNet = (id, net) => {
+    const el = document.getElementById(id);
+    el.classList.remove('gain', 'loss');
+    if (Math.abs(net) < 1) {
+      el.textContent = '—';
+      return;
+    }
+    el.textContent = fmtKcal(net, true);
+    if (net >= 0) el.classList.add('gain');
+    else el.classList.add('loss');
+  };
+  setNet('netDay', day.netKcal);
+  setNet('netWeek', week.netKcal);
+  setNet('netMonth', month.netKcal);
+  setNet('netYear', year.netKcal);
+}
+
+function render() {
+  const now = new Date();
+  document.getElementById('dateLabel').textContent = formatDate(now);
+  
+  // ===== FENÊTRE GLISSANTE 24H pour BAC, lipolyse, hydratation, calories actives =====
+  const window24hStart = new Date(now.getTime() - 24 * 3600000);
+  const drinks24h = getDrinksInWindow(window24hStart, now);
+  const r = computeBAC(drinks24h, now);
+  
+  // BAC affichage
+  document.getElementById('bacValue').textContent = formatBAC(r.bac);
+  document.getElementById('bacGrams').textContent = r.inBloodG.toFixed(1).replace('.', ',');
+  // Alcool métabolisé : Option B stricte → 0 si plus rien dans le sang (cycle terminé)
+  const metabolizedDisplay = r.bac > 0.01 ? r.metabolizedG.toFixed(1).replace('.', ',') : '0,0';
+  document.getElementById('metabGrams').textContent = metabolizedDisplay;
+  
+  // ===== DERNIER VERRE — recherche dans TOUT l'historique =====
+  let lastDrinkEver = null;
+  // Parcourir tout localStorage pour trouver le dernier verre
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(STORAGE_PREFIX + 'drinks_')) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(key));
+      if (!arr || !arr.length) continue;
+      for (const dr of arr) {
+        const t = new Date(dr.time);
+        if (isNaN(t.getTime())) continue;
+        if (!lastDrinkEver || t > lastDrinkEver) {
+          lastDrinkEver = t;
+        }
+      }
+    } catch (e) {}
+  }
+  // Ne pas oublier les verres du jour en cours (déjà dans drinks, peuvent ne pas être encore sauvegardés)
+  for (const dr of drinks) {
+    const t = new Date(dr.time);
+    if (isNaN(t.getTime())) continue;
+    if (!lastDrinkEver || t > lastDrinkEver) {
+      lastDrinkEver = t;
+    }
+  }
+  
+  // Affichage de la grande carte Dernier verre
+  // lastDrinkElapsed = grand décompte | lastDrinkTime = petite date
+  const lastDrinkCard = document.getElementById('lastDrinkCard');
+  const lastDrinkTimeEl = document.getElementById('lastDrinkTime');
+  const lastDrinkElapsedEl = document.getElementById('lastDrinkElapsed');
+  lastDrinkCard.classList.remove('no-data', 'recent', 'streak');
+  
+  if (!lastDrinkEver) {
+    lastDrinkElapsedEl.textContent = 'Aucun verre';
+    lastDrinkTimeEl.textContent = 'Aucun verre enregistré dans l\'historique';
+    document.getElementById('lastDrinkHealth').textContent = '';
+    lastDrinkCard.classList.add('no-data');
+  } else {
+    // Calcul temps écoulé (affiché EN GRAND)
+    const diffMs = now - lastDrinkEver;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / (24 * 3600000));
+    const diffMonths = Math.floor(diffDays / 30.44);
+    const diffYears = Math.floor(diffDays / 365.25);
+    
+    let elapsedStr;
+    if (diffYears >= 1) {
+      const remainMonths = Math.floor((diffDays - diffYears * 365.25) / 30.44);
+      elapsedStr = `Il y a ${diffYears} an${diffYears > 1 ? 's' : ''}${remainMonths > 0 ? ` ${remainMonths} mois` : ''}`;
+    } else if (diffMonths >= 1) {
+      const remainDays = diffDays - Math.floor(diffMonths * 30.44);
+      elapsedStr = `Il y a ${diffMonths} mois${remainDays > 0 ? ` ${remainDays} j` : ''}`;
+    } else if (diffDays >= 1) {
+      const remainHours = diffHours - diffDays * 24;
+      elapsedStr = `Il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}${remainHours > 0 ? ` ${remainHours} h` : ''}`;
+    } else if (diffHours >= 1) {
+      const remainMin = diffMin - diffHours * 60;
+      elapsedStr = `Il y a ${diffHours} h${remainMin > 0 ? ` ${remainMin} min` : ''}`;
+    } else {
+      elapsedStr = `Il y a ${diffMin} min`;
+    }
+    lastDrinkElapsedEl.textContent = elapsedStr;
+    
+    // Date du dernier verre (affichée EN PETIT)
+    const sameDay = lastDrinkEver.toDateString() === now.toDateString();
+    if (sameDay) {
+      lastDrinkTimeEl.textContent = `Aujourd'hui à ${formatTime(lastDrinkEver)}`;
+    } else {
+      const dateStr = lastDrinkEver.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      lastDrinkTimeEl.textContent = `${dateStr.charAt(0).toUpperCase() + dateStr.slice(1)} à ${formatTime(lastDrinkEver)}`;
+    }
+    
+    // ===== COMMENTAIRE SANTÉ — paliers basés sur littérature médicale =====
+    const healthEl = document.getElementById('lastDrinkHealth');
+    const hoursSince = diffMs / 3600000;
+    let healthMsg;
+    if (hoursSince < 6) {
+      healthMsg = 'Alcool en cours de métabolisation · lipolyse bloquée · sommeil perturbé';
+    } else if (hoursSince < 12) {
+      healthMsg = 'Élimination terminée · déstockage des graisses repris · récupération du foie amorcée';
+    } else if (hoursSince < 24) {
+      healthMsg = 'Foie au repos · hydratation à reconstituer · cycles de sommeil restaurés';
+    } else if (diffDays < 3) {
+      healthMsg = 'Sommeil profond restauré · vigilance et concentration améliorées';
+    } else if (diffDays < 7) {
+      healthMsg = 'Tension artérielle en baisse · sommeil paradoxal optimisé';
+    } else if (diffDays < 14) {
+      healthMsg = 'Réduction inflammation hépatique · perte de poids facilitée';
+    } else if (diffDays < 30) {
+      healthMsg = 'Régénération hépatique mesurable · GGT en baisse · meilleure peau';
+    } else if (diffMonths < 3) {
+      healthMsg = 'Microbiote intestinal restauré · fonctions cognitives optimales';
+    } else if (diffMonths < 6) {
+      healthMsg = 'Risque cardiovasculaire normalisé · sensibilité à l\'insuline améliorée';
+    } else if (diffMonths < 12) {
+      healthMsg = 'Risque de cancers ORL et hépatique en nette baisse';
+    } else {
+      healthMsg = 'Espérance de vie alignée sur celle des non-buveurs';
+    }
+    healthEl.textContent = healthMsg;
+    
+    // ===== RECORD D'ABSTINENCE — sous-ligne adaptative =====
+    const recordEl = document.getElementById('lastDrinkRecord');
+    const rec = computeAbstinenceRecord();
+    if (rec.recordMs > 0) {
+      const recordStr = formatDurationAdaptive(rec.recordMs);
+      if (rec.isCurrentRecord && rec.currentMs > 24 * 3600000) {
+        // Série en cours = record (et déjà > 24h, sinon trompeur)
+        recordEl.innerHTML = `<span class="lr-label">Record</span><span class="lr-value">${recordStr}</span><span class="lr-current-tag">En cours</span>`;
+      } else {
+        recordEl.innerHTML = `<span class="lr-label">Record</span><span class="lr-value">${recordStr}</span>`;
+      }
+    } else {
+      recordEl.innerHTML = '';
+    }
+    
+    // Coloration de la carte
+    if (diffHours < 12) {
+      lastDrinkCard.classList.add('recent');
+    } else if (diffDays >= 1) {
+      lastDrinkCard.classList.add('streak');
+    }
+  }
+  
+  // ===== PIC BAC — 4 FENÊTRES TEMPORELLES (jour / semaine / mois / année) =====
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dow = (now.getDay() + 6) % 7; // Lundi = 0
+  const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  
+  const peakDay = computePeakBacInRange(todayStart, now);
+  const peakWeek = computePeakBacInRange(weekStart, now);
+  const peakMonth = computePeakBacInRange(monthStart, now);
+  const peakYear = computePeakBacInRange(yearStart, now);
+  
+  const fmtPeak = (v) => v > 0 ? `${formatBAC(v)}<span class="small">g/L</span>` : '—';
+  document.getElementById('peakBacDay').innerHTML = fmtPeak(peakDay);
+  document.getElementById('peakBacWeek').innerHTML = fmtPeak(peakWeek);
+  document.getElementById('peakBacMonth').innerHTML = fmtPeak(peakMonth);
+  document.getElementById('peakBacYear').innerHTML = fmtPeak(peakYear);
+  
+  // ===== INGÉRÉ AUJOURD'HUI =====
+  const ingestedGToday = drinks.reduce((s, d) => s + alcoolPurGrammes(d.volumeML, d.degre), 0);
+  document.getElementById('purGrams').innerHTML = `${ingestedGToday.toFixed(1).replace('.', ',')}<span class="small"> g</span>`;
+  
+  // Couleur BAC en fonction du seuil légal (0,5 g/L France)
+  const bacCard = document.getElementById('bacCard');
+  bacCard.classList.remove('alert', 'warn', 'active', 'success');
+  let bacSubText;
+  if (r.bac >= BAC_LEGAL) {
+    bacCard.classList.add('alert');
+    bacSubText = `⛔ Au-dessus seuil légal ${BAC_LEGAL} g/L`;
+  } else if (r.bac >= 0.3) {
+    bacCard.classList.add('warn');
+    bacSubText = `⚠ Approche du seuil ${BAC_LEGAL} g/L`;
+  } else if (r.bac >= 0.1) {
+    bacCard.classList.add('active');
+    bacSubText = `Conduite OK (seuil ${BAC_LEGAL})`;
+  } else if (r.bac > 0.01) {
+    bacCard.classList.add('success');
+    bacSubText = `Conduite OK · faible BAC`;
+  } else {
+    bacCard.classList.add('success');
+    bacSubText = `Aucun alcool dans le sang`;
+  }
+  document.getElementById('bacSub').textContent = bacSubText;
+  
+  // ===== LIPOLYSE — calculs internes pour la grande carte détails =====
+  // Constante : oxydation lipidique au repos (homme adulte) ≈ 3,6 g/h (60 mg/min)
+  // Référence : van Loon et al. 2001 ; Frayn 2010
+  const LIPID_OX_RATE_GH = 3.6; // g/h au repos
+  const DEBLOCK_RELEVANCE_MS = 48 * 3600000; // 48h de pertinence après déblocage
+  
+  let lipoDurationStr = '—';
+  let lipidsOxidizedStr = '—';
+  let zeroTimeStr = '—';
+  let zeroSubText = 'Pas de retour à attendre';
+  let lipoHours = 0;
+  
+  if (r.firstTime && r.bac > 0.01) {
+    // CAS 1 — Alcool encore présent : lipolyse bloquée
+    const hoursToZero = r.bac / ELIM_RATE;
+    const zeroDate = new Date(now.getTime() + hoursToZero * 3600000);
+    zeroTimeStr = formatTime(zeroDate);
+    zeroSubText = `dans ${hoursToZero.toFixed(1).replace('.', ',')} h`;
+    lipoHours = (zeroDate - r.firstTime) / 3600000;
+    lipoDurationStr = `bloquée ${lipoHours.toFixed(1).replace('.', ',')} h`;
+    lipidsOxidizedStr = '0 g (bloquée)';
+  } else {
+    // CAS 2 — BAC = 0 : vérifier déblocage récent
+    const deblockTime = getLastDeblockTime();
+    if (deblockTime) {
+      const sinceDeblockMs = now - deblockTime;
+      if (sinceDeblockMs < DEBLOCK_RELEVANCE_MS) {
+        const sinceH = sinceDeblockMs / 3600000;
+        const gramsOx = sinceH * LIPID_OX_RATE_GH;
+        lipidsOxidizedStr = `≈ ${gramsOx.toFixed(0)} g <span class="small">(repos, 3,6 g/h)</span>`;
+        lipoDurationStr = `débloquée +${sinceH.toFixed(1).replace('.', ',')} h`;
+      }
+    }
+  }
+  
+  document.getElementById('lipoDuration').textContent = lipoDurationStr;
+  document.getElementById('lipidsOxidized').innerHTML = lipidsOxidizedStr;
+  
+  // RETOUR À 0 G/L : carte principale
+  document.getElementById('zeroTime').textContent = zeroTimeStr;
+  document.getElementById('zeroSub').textContent = zeroSubText;
+  const zeroCard = document.getElementById('zeroCard');
+  zeroCard.classList.remove('alert', 'warn', 'active', 'success');
+  if (r.bac >= BAC_LEGAL) {
+    zeroCard.classList.add('alert');
+  } else if (r.bac >= 0.1) {
+    zeroCard.classList.add('warn');
+  } else if (r.bac > 0.01) {
+    zeroCard.classList.add('active');
+  } else {
+    zeroCard.classList.add('success');
+  }
+  
+  // ===== DÉFICIT HYDRIQUE — 24h glissantes (info dans la grande carte détails) =====
+  // Référence : Hobson & Maughan 2010 — ~10 mL urine en excès par g d'éthanol
+  const waterDeficitML = r.bac > 0.01 ? Math.round(r.ingestedG * 10) : 0;
+  document.getElementById('waterValue').textContent = waterDeficitML;
+  
+  // ===== COÛT ALCOOL — 4 fenêtres (jour / semaine / mois / année) =====
+  renderAlcoholCost(now);
+  
+  // ===== COMPTEURS — jour calendaire =====
+  const totalCLToday = drinks.reduce((s,d) => s + d.volumeML/10, 0);
+  document.getElementById('glassCount').textContent = drinks.length;
+  document.getElementById('volTotal').textContent = `${Math.round(totalCLToday)} cl ingérés`;
+  
+  renderBottles(totalCLToday);
+  renderTimeline();
+  showBaclofeneWarning();
+  computeStreak();
+}
+
+// ============ HISTORIQUE ============
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const now = new Date();
+  let startDate;
+  if (currentPeriod === 'day') startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  else if (currentPeriod === 'week') {
+    const dow = (now.getDay() + 6) % 7;
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+  }
+  else if (currentPeriod === 'month') startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  else if (currentPeriod === 'year') startDate = new Date(now.getFullYear(), 0, 1);
+
+  let totalGlasses = 0, totalVolCL = 0;
+  const rows = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(STORAGE_PREFIX + 'drinks_')) continue;
+    const dateStr = key.replace(STORAGE_PREFIX + 'drinks_', '');
+    const parts = dateStr.split('-').map(Number);
+    if (parts.length !== 3) continue;
+    const d = new Date(parts[0], parts[1]-1, parts[2]);
+    if (d < startDate || d > now) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(key));
+      if (!arr || !arr.length) continue;
+      const volCL = arr.reduce((s,x) => s + x.volumeML/10, 0);
+      const sorted = [...arr].sort((a,b) => new Date(a.time) - new Date(b.time));
+      const lastTime = new Date(sorted[sorted.length-1].time);
+      const peakBAC = computeBAC(arr, lastTime).bac;
+      totalGlasses += arr.length;
+      totalVolCL += volCL;
+      rows.push({ date: d, glasses: arr.length, volCL, peakBAC });
+    } catch (e) {}
+  }
+
+  rows.sort((a,b) => b.date - a.date);
+  document.getElementById('totGlasses').textContent = totalGlasses;
+  document.getElementById('totVolume').textContent = `${Math.round(totalVolCL)} cl`;
+  document.getElementById('totBottles').textContent = (totalVolCL/75).toFixed(1).replace('.', ',');
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="timeline-empty">Aucun verre sur cette période</div>';
+    return;
+  }
+  list.innerHTML = rows.map(r => {
+    const dateStr = r.date.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+    const dKey = dateKeyStr(r.date);
+    return `<div class="history-row" data-dkey="${dKey}">
+      <span class="h-date">${dateStr}</span>
+      <span class="h-vol">${Math.round(r.volCL)} cl · ${r.glasses} v.</span>
+      <span class="h-bac">pic ${formatBAC(r.peakBAC)} g/L <span class="h-arrow">›</span></span>
+    </div>`;
+  }).join('');
+  // Lignes cliquables
+  list.querySelectorAll('.history-row').forEach(el => {
+    el.addEventListener('click', () => openDayDetail(el.dataset.dkey));
+  });
+}
+
+
+// ============ ACTIONS ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 1800);
+}
+
+// Variable pour tracker si l'utilisateur a modifié manuellement l'heure
+let inputTimeManuallyEdited = false;
+
+function refreshInputTime() {
+  // Met à jour le champ HEURE avec l'heure actuelle, sauf si l'utilisateur l'a modifié manuellement
+  if (!inputTimeManuallyEdited) {
+    const el = document.getElementById('inputTime');
+    if (el) el.value = getCurrentTimeStr();
+  }
+}
+
+function addDrink() {
+  const volume = parseFloat(document.getElementById('inputVolume').value);
+  const degree = parseFloat(document.getElementById('inputDegree').value);
+  let timeStr = document.getElementById('inputTime').value;
+  
+  // Sécurité : si l'utilisateur n'a jamais touché au champ heure, on prend l'heure actuelle
+  // (évite le décalage si la PWA est restée ouverte en arrière-plan longtemps)
+  if (!inputTimeManuallyEdited) {
+    timeStr = getCurrentTimeStr();
+  }
+  
+  if (!volume || volume <= 0) { showToast('Volume invalide'); return; }
+  if (isNaN(degree) || degree < 0) { showToast('Degré invalide'); return; }
+  if (!timeStr) { showToast('Heure invalide'); return; }
+  
+  const drink = {
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    time: timeStrToISO(timeStr),
+    volumeML: volume * 10,
+    degre: degree,
+    type: currentType
+  };
+  drinks.push(drink);
+  saveToday();
+  saveSettings();
+  render();
+  renderHistory();
+  showToast(`+ ${volume} cl · ${DRINK_TYPES[currentType].label} · ${formatTime(new Date(drink.time))}`);
+  // Réinitialise le champ et le flag manuel
+  inputTimeManuallyEdited = false;
+  document.getElementById('inputTime').value = getCurrentTimeStr();
+}
+
+// editingDrinkId / editingDateKey : identifie le verre en cours d'édition
+// editingDateKey = null si c'est dans drinks (aujourd'hui), sinon = "YYYY-MM-DD" (jour passé)
+let editingDateKey = null;
+
+function openEditModal(id, dateKeyArg) {
+  // Si dateKeyArg fourni, on cherche dans le storage de ce jour-là
+  let drink = null;
+  if (dateKeyArg) {
+    try {
+      const v = localStorage.getItem(STORAGE_PREFIX + 'drinks_' + dateKeyArg);
+      if (v) {
+        const arr = JSON.parse(v);
+        drink = arr.find(d => d.id === id);
+      }
+    } catch (e) {}
+    editingDateKey = dateKeyArg;
+  } else {
+    drink = drinks.find(d => d.id === id);
+    editingDateKey = null;
+  }
+  if (!drink) return;
+  editingDrinkId = id;
+  const t = new Date(drink.time);
+  const typeLabel = drink.type && DRINK_TYPES[drink.type] ? DRINK_TYPES[drink.type].label : '—';
+  const dateStr = t.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'short' });
+  document.getElementById('editSub').textContent = `${typeLabel} · ${dateStr} ${formatTime(t)}`;
+  document.getElementById('editVolume').value = drink.volumeML / 10;
+  document.getElementById('editDegree').value = drink.degre;
+  document.getElementById('editDate').value = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  document.getElementById('editTime').value = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('editModal').classList.add('visible');
+}
+
+function saveEditedDrink() {
+  if (editingDrinkId === null) return;
+  const vol = parseFloat(document.getElementById('editVolume').value);
+  const deg = parseFloat(document.getElementById('editDegree').value);
+  const timeStr = document.getElementById('editTime').value;
+  const dateStr = document.getElementById('editDate').value;
+  if (!vol || vol <= 0) { showToast('Volume invalide'); return; }
+  if (deg < 0 || isNaN(deg)) { showToast('Degré invalide'); return; }
+  if (!timeStr) { showToast('Heure invalide'); return; }
+  if (!dateStr) { showToast('Date invalide'); return; }
+  
+  // Détermine le jour actuel du verre (avant édition)
+  const currentDateKey = editingDateKey || dateKeyStr(new Date());
+  // Le nouveau jour est tiré du champ date (format YYYY-MM-DD)
+  const newDateKey = dateStr;
+  
+  // Construit le nouveau timestamp ISO à partir de date + heure
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const [hh, mm] = timeStr.split(':').map(Number);
+  const newDate = new Date(y, mo-1, d, hh, mm, 0, 0);
+  const newTimeISO = newDate.toISOString();
+  
+  // Cas 1 : même jour → on modifie sur place
+  if (currentDateKey === newDateKey) {
+    if (editingDateKey) {
+      // Jour passé
+      try {
+        const key = STORAGE_PREFIX + 'drinks_' + editingDateKey;
+        const v = localStorage.getItem(key);
+        if (!v) return;
+        const arr = JSON.parse(v);
+        const idx = arr.findIndex(dr => dr.id === editingDrinkId);
+        if (idx === -1) return;
+        arr[idx].volumeML = vol * 10;
+        arr[idx].degre = deg;
+        arr[idx].time = newTimeISO;
+        localStorage.setItem(key, JSON.stringify(arr));
+      } catch (e) { showToast('Erreur enregistrement'); return; }
+    } else {
+      // Jour courant
+      const idx = drinks.findIndex(dr => dr.id === editingDrinkId);
+      if (idx === -1) return;
+      drinks[idx].volumeML = vol * 10;
+      drinks[idx].degre = deg;
+      drinks[idx].time = newTimeISO;
+      saveToday();
+    }
+  } else {
+    // Cas 2 : déplacement entre jours
+    // a) Construit le verre mis à jour
+    let drinkToMove;
+    if (editingDateKey) {
+      // Charge depuis le jour passé
+      try {
+        const key = STORAGE_PREFIX + 'drinks_' + editingDateKey;
+        const v = localStorage.getItem(key);
+        if (!v) return;
+        const arr = JSON.parse(v);
+        const idx = arr.findIndex(dr => dr.id === editingDrinkId);
+        if (idx === -1) return;
+        drinkToMove = { ...arr[idx], volumeML: vol * 10, degre: deg, time: newTimeISO };
+        // Retire du jour ancien
+        const newArr = arr.filter(dr => dr.id !== editingDrinkId);
+        if (newArr.length === 0) {
+          localStorage.removeItem(key);
+        } else {
+          localStorage.setItem(key, JSON.stringify(newArr));
+        }
+      } catch (e) { showToast('Erreur déplacement'); return; }
+    } else {
+      // Verre du jour courant
+      const idx = drinks.findIndex(dr => dr.id === editingDrinkId);
+      if (idx === -1) return;
+      drinkToMove = { ...drinks[idx], volumeML: vol * 10, degre: deg, time: newTimeISO };
+      // Retire de drinks (jour courant)
+      drinks = drinks.filter(dr => dr.id !== editingDrinkId);
+      saveToday();
+    }
+    
+    // b) Ajoute au nouveau jour
+    const newKey = STORAGE_PREFIX + 'drinks_' + newDateKey;
+    let targetArr = [];
+    try {
+      const v = localStorage.getItem(newKey);
+      if (v) targetArr = JSON.parse(v);
+    } catch (e) {}
+    targetArr.push(drinkToMove);
+    localStorage.setItem(newKey, JSON.stringify(targetArr));
+    
+    // c) Si le nouveau jour est aujourd'hui, on recharge drinks
+    const todayKeyStr = dateKeyStr(new Date());
+    if (newDateKey === todayKeyStr) {
+      loadToday();
+    }
+  }
+  
+  render();
+  renderHistory();
+  if (document.getElementById('dayDetailModal').classList.contains('visible')) {
+    // Si on a déplacé hors du jour affiché, on ferme le modal détail
+    if (currentDateKey !== newDateKey && currentDayDetailKey === currentDateKey) {
+      // Recharge avec l'ancien jour pour montrer qu'il a un verre en moins
+      renderDayDetail(currentDayDetailKey);
+    } else if (currentDayDetailKey === newDateKey) {
+      renderDayDetail(currentDayDetailKey);
+    }
+  }
+  closeEditModal();
+  showToast(currentDateKey !== newDateKey ? 'Verre déplacé' : 'Verre modifié');
+}
+
+function deleteDrink() {
+  if (editingDrinkId === null) return;
+  if (editingDateKey) {
+    // Suppression dans un jour passé
+    try {
+      const key = STORAGE_PREFIX + 'drinks_' + editingDateKey;
+      const v = localStorage.getItem(key);
+      if (!v) return;
+      let arr = JSON.parse(v);
+      arr = arr.filter(d => d.id !== editingDrinkId);
+      if (arr.length === 0) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify(arr));
+      }
+    } catch (e) { showToast('Erreur suppression'); return; }
+  } else {
+    drinks = drinks.filter(d => d.id !== editingDrinkId);
+    saveToday();
+  }
+  
+  render();
+  renderHistory();
+  if (document.getElementById('dayDetailModal').classList.contains('visible')) {
+    renderDayDetail(currentDayDetailKey);
+  }
+  closeEditModal();
+  showToast('Verre supprimé');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('visible');
+  editingDrinkId = null;
+  editingDateKey = null;
+}
+
+// ============ MODAL DÉTAIL D'UN JOUR PASSÉ ============
+let currentDayDetailKey = null;
+
+function openDayDetail(dateKeyArg) {
+  currentDayDetailKey = dateKeyArg;
+  renderDayDetail(dateKeyArg);
+  document.getElementById('dayDetailModal').classList.add('visible');
+}
+
+function renderDayDetail(dateKeyArg) {
+  if (!dateKeyArg) return;
+  const parts = dateKeyArg.split('-').map(Number);
+  const date = new Date(parts[0], parts[1]-1, parts[2]);
+  const dateLabel = date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('dayDetailTitle').textContent = `Verres du ${dateLabel}`;
+  
+  let arr = [];
+  try {
+    const v = localStorage.getItem(STORAGE_PREFIX + 'drinks_' + dateKeyArg);
+    if (v) arr = JSON.parse(v);
+  } catch (e) {}
+  
+  const container = document.getElementById('dayDetailList');
+  if (!arr.length) {
+    container.innerHTML = '<div class="timeline-empty">Aucun verre ce jour-là</div>';
+    return;
+  }
+  
+  // Stats du jour
+  const totalCL = arr.reduce((s, d) => s + d.volumeML/10, 0);
+  const totalG = arr.reduce((s, d) => s + alcoolPurGrammes(d.volumeML, d.degre), 0);
+  const totalKcal = Math.round(totalG * 7);
+  const sorted = [...arr].sort((a,b) => new Date(a.time) - new Date(b.time));
+  const peakBAC = computeBAC(arr, new Date(sorted[sorted.length-1].time)).bac;
+  
+  document.getElementById('dayDetailStats').innerHTML = `
+    <div class="dd-stat"><span class="dd-stat-l">Verres</span><span class="dd-stat-v">${arr.length}</span></div>
+    <div class="dd-stat"><span class="dd-stat-l">Volume</span><span class="dd-stat-v">${Math.round(totalCL)} cl</span></div>
+    <div class="dd-stat"><span class="dd-stat-l">Calories</span><span class="dd-stat-v">${totalKcal} kcal</span></div>
+    <div class="dd-stat"><span class="dd-stat-l">Pic BAC</span><span class="dd-stat-v">${formatBAC(peakBAC)} g/L</span></div>
+  `;
+  
+  // Liste des verres (cliquables pour édition)
+  const sortedDesc = [...arr].sort((a,b) => new Date(b.time) - new Date(a.time));
+  container.innerHTML = sortedDesc.map((d, i) => {
+    const t = new Date(d.time);
+    const typeLabel = d.type && DRINK_TYPES[d.type] ? DRINK_TYPES[d.type].label : '—';
+    return `<div class="timeline-item" data-id="${d.id}" data-dkey="${dateKeyArg}">
+      <span><span class="t-hour">${formatTime(t)}</span> <span class="t-info">· ${sortedDesc.length - i}e verre</span></span>
+      <span class="t-info">${d.volumeML/10} cl · ${typeLabel} ${d.degre}° <span class="t-edit">✎</span></span>
+    </div>`;
+  }).join('');
+  container.querySelectorAll('.timeline-item').forEach(el => {
+    el.addEventListener('click', () => {
+      openEditModal(parseInt(el.dataset.id), el.dataset.dkey);
+    });
+  });
+}
+
+function closeDayDetail() {
+  document.getElementById('dayDetailModal').classList.remove('visible');
+  currentDayDetailKey = null;
+}
+
+
+// ============ EVENTS ============
+document.querySelectorAll('#chipsRow .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#chipsRow .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentType = chip.dataset.type;
+    const def = DRINK_TYPES[currentType];
+    if (def) document.getElementById('inputDegree').value = def.defaultDegre;
+    saveSettings();
+  });
+});
+
+document.getElementById('addBtn').addEventListener('click', addDrink);
+
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  document.getElementById('weight').value = settings.weight;
+  document.getElementById('weightTarget').value = settings.weightTarget;
+  document.getElementById('goalKcal').value = settings.goalKcal;
+  document.getElementById('settingsModal').classList.add('visible');
+});
+document.getElementById('settingsCancel').addEventListener('click', () => {
+  document.getElementById('settingsModal').classList.remove('visible');
+});
+document.getElementById('settingsSave').addEventListener('click', () => {
+  settings.weight = parseFloat(document.getElementById('weight').value) || 78.4;
+  settings.weightTarget = parseFloat(document.getElementById('weightTarget').value) || 67;
+  settings.goalKcal = parseInt(document.getElementById('goalKcal').value) || 500;
+  saveSettings();
+  document.getElementById('settingsModal').classList.remove('visible');
+  render();
+  showToast('Paramètres enregistrés');
+});
+
+
+
+
+document.getElementById('editSave').addEventListener('click', saveEditedDrink);
+document.getElementById('editDelete').addEventListener('click', () => {
+  if (confirm('Supprimer ce verre ?')) deleteDrink();
+});
+document.getElementById('editCancel').addEventListener('click', closeEditModal);
+
+document.getElementById('dayDetailClose').addEventListener('click', closeDayDetail);
+
+document.querySelectorAll('.tabs .tab[data-period]').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tabs .tab[data-period]').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentPeriod = t.dataset.period;
+    renderHistory();
+  });
+});
+
+// Refresh BAC every 30s
+setInterval(() => {
+  // Refresh même sans verres aujourd'hui s'il y en a eu hier (résidus 24h)
+  render();
+}, 30000);
+
+// Détection passage de minuit : recharge les verres du jour à la nouvelle date
+setInterval(() => {
+  const newKey = todayKey();
+  const currentKey = drinks.length > 0 ? todayKey() : null;
+  // Si la date a changé depuis le dernier reload (cas où l'app reste ouverte la nuit)
+  if (newKey !== window.__lastTodayKey) {
+    window.__lastTodayKey = newKey;
+    loadToday();
+    render();
+    renderHistory();
+  }
+}, 60000);
+window.__lastTodayKey = todayKey();
+
+// Service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
+  });
+}
+
+function syncChipsWithCurrentType() {
+  document.querySelectorAll('#chipsRow .chip').forEach(c => {
+    if (c.dataset.type === currentType) c.classList.add('active');
+    else c.classList.remove('active');
+  });
+}
+
+// Init
+loadSettings();
+loadToday();
+syncChipsWithCurrentType();
+document.getElementById('inputTime').value = getCurrentTimeStr();
+
+// Détection saisie manuelle de l'heure
+document.getElementById('inputTime').addEventListener('input', () => {
+  inputTimeManuallyEdited = true;
+});
+
+// Rafraîchir l'heure quand l'app reprend le focus
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshInputTime();
+});
+window.addEventListener('focus', refreshInputTime);
+window.addEventListener('pageshow', refreshInputTime);
+
+render();
+renderHistory();
+</script>
+</body>
+</html>
